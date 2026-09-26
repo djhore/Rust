@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust - Dashboard</title>
+</head>
+<body>
+
+    <h1>Welcome to Rust</h1>
+
+    <p>
+        Welcome, {{ request.user.first_name }} {{ request.user.last_name }}.
+    </p>
+
+    <p>
+        Username: {{ request.user.username }}
+    </p>
+
+    <p>
+        Role: {{ profile.get_role_display }}
+    </p>
+
+    <h2>Tenant Dashboard</h2>
+
+    <p>From here you will be able to manage your apartment maintenance requests.</p>
+
+    <hr>
+
+    <h3>Quick Actions</h3>
+
+    <p>
+        <a href="{% url 'submit_request' %}">Submit Maintenance Request</a>
+    </p>
+
+    <p>
+        <a href="{% url 'my_requests' %}">View My Requests</a>
+    </p>
+
+   <p>
+        <a href="{% url 'maintenance_history' %}">View Maintenance History</a>
+   </p>
+
+    <hr>
+
+    <p>
+        <a href="{% url 'logout' %}">Logout</a>
+    </p>
+</body>
+</html>

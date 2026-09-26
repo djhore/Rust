@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust - Maintenance History</title>
+</head>
+<body>
+
+    <h1>Maintenance History</h1>
+
+    <p>
+        <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    </p>
+
+    {% if history %}
+
+        {% for request in history %}
+
+            <hr>
+
+            <h2>
+                <a href="{% url 'request_detail' request.id %}">
+                    {{ request.problem_title }}
+                </a>
+            </h2>
+
+            <p>
+                <strong>Category:</strong>
+                {{ request.get_category_display }}
+            </p>
+
+            <p>
+                <strong>Priority:</strong>
+                {{ request.get_priority_display }}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                {{ request.get_status_display }}
+            </p>
+
+            <p>
+                <strong>Date Submitted:</strong>
+                {{ request.date_submitted }}
+            </p>
+
+            {% if request.date_completed %}
+                <p>
+                    <strong>Date Completed:</strong>
+                    {{ request.date_completed }}
+                </p>
+            {% endif %}
+
+            {% if request.repair_notes %}
+                <p>
+                    <strong>Repair Notes:</strong>
+                    {{ request.repair_notes }}
+                </p>
+            {% endif %}
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>You do not have any completed maintenance requests yet.</p>
+
+    {% endif %}
+
+</body>
+</html>

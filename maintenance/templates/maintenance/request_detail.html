@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust - Request Details</title>
+</head>
+<body>
+
+    <h1>Maintenance Request Details</h1>
+
+    <p>
+        <a href="{% url 'my_requests' %}">Back to My Requests</a>
+    </p>
+
+    <hr>
+
+    <h2>{{ maintenance_request.problem_title }}</h2>
+
+    <p>
+        <strong>Category:</strong>
+        {{ maintenance_request.get_category_display }}
+    </p>
+
+    <p>
+        <strong>Description:</strong>
+        {{ maintenance_request.description }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        {{ maintenance_request.get_status_display }}
+    </p>
+
+    <p>
+        <strong>Priority:</strong>
+        {{ maintenance_request.get_priority_display }}
+    </p>
+
+    <p>
+        <strong>Date Submitted:</strong>
+        {{ maintenance_request.date_submitted }}
+    </p>
+
+    {% if maintenance_request.date_assigned %}
+        <p>
+            <strong>Date Assigned:</strong>
+            {{ maintenance_request.date_assigned }}
+        </p>
+    {% endif %}
+
+    {% if maintenance_request.assigned_technician %}
+        <p>
+            <strong>Assigned Technician:</strong>
+            {{ maintenance_request.assigned_technician.get_full_name|default:maintenance_request.assigned_technician.username }}
+        </p>
+    {% else %}
+        <p>
+            <strong>Assigned Technician:</strong>
+            Not yet assigned
+        </p>
+    {% endif %}
+
+    {% if maintenance_request.date_completed %}
+        <p>
+            <strong>Date Completed:</strong>
+            {{ maintenance_request.date_completed }}
+        </p>
+    {% endif %}
+
+    {% if maintenance_request.repair_notes %}
+        <p>
+            <strong>Repair Notes:</strong>
+            {{ maintenance_request.repair_notes }}
+        </p>
+    {% else %}
+        <p>
+            <strong>Repair Notes:</strong>
+            No repair notes yet.
+        </p>
+    {% endif %}
+
+    {% if maintenance_request.image %}
+        <h3>Supporting Image</h3>
+
+        <img
+            src="{{ maintenance_request.image.url }}"
+            alt="Maintenance request image"
+            width="400"
+        >
+    {% else %}
+        <p>No supporting image was uploaded.</p>
+    {% endif %}
+
+</body>
+</html>

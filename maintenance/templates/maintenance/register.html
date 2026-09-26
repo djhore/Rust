@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust - Tenant Registration</title>
+</head>
+<body>
+<!-- Step 5 — Create the registration page
+We're going to create an HTML template for the tenant registration form.
+So we don't have to manually write HTML for every field yet.
+The page should automatically display fields for:
+Username,First name,Last name,Email,Phone number,Apartment number,Password,Password confirmation -->
+    
+    <h1>Create Your Rust Account</h1>
+
+    <p>Register as a tenant to submit and track maintenance requests.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+<!-- adds Django's security protection to the form. -->
+        {{ form.as_p }}
+<!-- tells Django:
+Display all the fields from TenantRegistrationForm. -->
+        <button type="submit">Create Account</button>
+    </form>
+
+    <p>
+        Already have an account?
+       <a href="{% url 'login' %}">Login</a>
+    </p>
+
+</body>
+</html>
