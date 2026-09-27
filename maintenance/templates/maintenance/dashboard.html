@@ -1,50 +1,248 @@
-<!DOCTYPE html>
+{% load static %}
+
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Rust - Dashboard</title>
-</head>
-<body>
 
-    <h1>Welcome to Rust</h1>
+    <!-- Rust fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <p>
-        Welcome, {{ request.user.first_name }} {{ request.user.last_name }}.
-    </p>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <p>
-        Username: {{ request.user.username }}
-    </p>
+    <!-- Rust stylesheet -->
+    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}" />
+  </head>
 
-    <p>
-        Role: {{ profile.get_role_display }}
-    </p>
+  <body>
+    <!-- Navigation -->
+    <nav class="rust-navbar">
+      <div class="rust-navbar-brand">
+        <svg
+          class="rust-navbar-logo"
+          viewBox="0 0 120 100"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-label="Rust apartment maintenance logo"
+        >
+          <defs>
+            <linearGradient
+              id="rustMetalDashboard"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stop-color="#F0A06A" />
+              <stop offset="30%" stop-color="#D97744" />
+              <stop offset="65%" stop-color="#B7410E" />
+              <stop offset="100%" stop-color="#7A2709" />
+            </linearGradient>
+          </defs>
 
-    <h2>Tenant Dashboard</h2>
+          <path
+            d="M12 88
+           V30
+           L45 12
+           V88"
+            fill="none"
+            stroke="url(#rustMetalDashboard)"
+            stroke-width="7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
 
-    <p>From here you will be able to manage your apartment maintenance requests.</p>
+          <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A" />
+          <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744" />
+          <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744" />
+          <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E" />
+          <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E" />
+          <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A" />
 
-    <hr>
+          <path
+            d="M12 28 L30 18 L48 10"
+            fill="none"
+            stroke="url(#rustMetalDashboard)"
+            stroke-width="6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
 
-    <h3>Quick Actions</h3>
+          <path
+            d="
+            M68 29
+            C60 29 54 35 54 43
+            C54 49 58 54 63 56
+            L49 78
+            C47 82 48 86 52 88
+            C56 90 60 87 62 84
+            L76 62
+            C82 64 88 61 91 56
+            C95 50 94 43 90 39
+            L80 49
+            L73 42
+            L83 32
+            C78 29 73 28 68 29
+            Z
+        "
+            fill="none"
+            stroke="url(#rustMetalDashboard)"
+            stroke-width="6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
 
-    <p>
-        <a href="{% url 'submit_request' %}">Submit Maintenance Request</a>
-    </p>
+        <div>
+          <div class="rust-navbar-title">Rust</div>
+          <div class="rust-navbar-subtitle">Apartment Maintenance</div>
+        </div>
+      </div>
 
-    <p>
-        <a href="{% url 'my_requests' %}">View My Requests</a>
-    </p>
+      <div class="rust-navbar-links">
+        <a href="{% url 'dashboard' %}" class="nav-link active"> Dashboard </a>
 
-   <p>
-        <a href="{% url 'maintenance_history' %}">View Maintenance History</a>
-   </p>
+        <a href="{% url 'my_requests' %}" class="nav-link"> My Requests </a>
 
-    <hr>
+        <a href="{% url 'maintenance_history' %}" class="nav-link"> History </a>
 
-    <p>
-        <a href="{% url 'logout' %}">Logout</a>
-    </p>
-</body>
+        <a href="{% url 'logout' %}" class="nav-link logout-link"> Logout </a>
+      </div>
+    </nav>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-container">
+      <!-- Welcome section -->
+      <section class="dashboard-welcome">
+        <div>
+          <p class="dashboard-label">TENANT DASHBOARD</p>
+
+          <h1>Welcome back, {{ request.user.first_name }}!</h1>
+
+          <p class="dashboard-description">
+            Manage your apartment maintenance requests and keep track of
+            reported issues.
+          </p>
+        </div>
+      </section>
+
+      <!-- Profile Card -->
+      <section class="profile-card">
+        <div class="profile-card-heading">
+          <h2>Your Profile</h2>
+        </div>
+
+        <div class="profile-details">
+          <div class="profile-item">
+            <span class="profile-label">Name</span>
+
+            <span class="profile-value">
+              {{ request.user.first_name }} {{ request.user.last_name }}
+            </span>
+          </div>
+
+          <div class="profile-item">
+            <span class="profile-label">Username</span>
+
+            <span class="profile-value"> @{{ request.user.username }} </span>
+          </div>
+
+          <div class="profile-item">
+            <span class="profile-label">Role</span>
+
+            <span class="profile-role"> {{ profile.get_role_display }} </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Actions -->
+      <section class="dashboard-section">
+        <div class="section-heading">
+          <p class="dashboard-label">GET STARTED</p>
+
+          <h2>Quick Actions</h2>
+        </div>
+
+        <div class="action-grid">
+          <!-- Submit Request -->
+          <a href="{% url 'submit_request' %}" class="action-card">
+            <div class="action-icon">+</div>
+
+            <div>
+              <h3>Submit Maintenance Request</h3>
+
+              <p>Report a maintenance problem in your apartment.</p>
+            </div>
+
+            <span class="action-arrow">→</span>
+          </a>
+
+          <!-- My Requests -->
+          <a href="{% url 'my_requests' %}" class="action-card">
+            <div class="action-icon">✓</div>
+
+            <div>
+              <h3>View My Requests</h3>
+
+              <p>Check the status of your submitted requests.</p>
+            </div>
+
+            <span class="action-arrow">→</span>
+          </a>
+
+          <!-- Maintenance History -->
+          <a href="{% url 'maintenance_history' %}" class="action-card">
+            <div class="action-icon">↺</div>
+
+            <div>
+              <h3>Maintenance History</h3>
+
+              <p>View your previous maintenance requests and records.</p>
+            </div>
+
+            <span class="action-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Bottom information -->
+      <section class="dashboard-info">
+        <div>
+          <h3>Need to report a problem?</h3>
+
+          <p>
+            Submit a maintenance request and provide details about the issue so
+            it can be handled.
+          </p>
+        </div>
+
+        <a href="{% url 'submit_request' %}" class="btn-primary">
+          Submit Request
+        </a>
+      </section>
+    </main>
+    <footer class="rust-footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">RUST</div>
+
+          <p>Apartment Maintenance Portal</p>
+        </div>
+
+        <div class="footer-text">
+          <p>
+            A centralized platform for managing apartment maintenance requests.
+          </p>
+
+          <p class="footer-copyright">&copy; 2026 Rust. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

@@ -1,71 +1,270 @@
-<!DOCTYPE html>
+{% load static %}
+
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Rust - Maintenance History</title>
-</head>
-<body>
 
-    <h1>Maintenance History</h1>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <p>
-        <a href="{% url 'dashboard' %}">Back to Dashboard</a>
-    </p>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    {% if history %}
+    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}" />
+  </head>
 
+  <body>
+    <!-- Navigation -->
+
+    <nav class="rust-navbar">
+      <div class="rust-navbar-brand">
+        <svg
+          class="rust-navbar-logo"
+          viewBox="0 0 120 100"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-label="Rust apartment maintenance logo"
+        >
+          <defs>
+            <linearGradient
+              id="rustMetalHistory"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stop-color="#F0A06A" />
+              <stop offset="30%" stop-color="#D97744" />
+              <stop offset="65%" stop-color="#B7410E" />
+              <stop offset="100%" stop-color="#7A2709" />
+            </linearGradient>
+          </defs>
+
+          <path
+            d="M12 88
+                       V30
+                       L45 12
+                       V88"
+            fill="none"
+            stroke="url(#rustMetalHistory)"
+            stroke-width="7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+          <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A" />
+          <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744" />
+          <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744" />
+          <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E" />
+          <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E" />
+          <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A" />
+
+          <path
+            d="M12 28 L30 18 L48 10"
+            fill="none"
+            stroke="url(#rustMetalHistory)"
+            stroke-width="6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+
+          <path
+            d="
+                        M68 29
+                        C60 29 54 35 54 43
+                        C54 49 58 54 63 56
+                        L49 78
+                        C47 82 48 86 52 88
+                        C56 90 60 87 62 84
+                        L76 62
+                        C82 64 88 61 91 56
+                        C95 50 94 43 90 39
+                        L80 49
+                        L73 42
+                        L83 32
+                        C78 29 73 28 68 29
+                        Z
+                    "
+            fill="none"
+            stroke="url(#rustMetalHistory)"
+            stroke-width="6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+
+        <div>
+          <div class="rust-navbar-title">Rust</div>
+
+          <div class="rust-navbar-subtitle">Apartment Maintenance</div>
+        </div>
+      </div>
+
+      <div class="rust-navbar-links">
+        <a href="{% url 'dashboard' %}" class="nav-link"> Dashboard </a>
+
+        <a href="{% url 'my_requests' %}" class="nav-link"> My Requests </a>
+
+        <a href="{% url 'maintenance_history' %}" class="nav-link active">
+          History
+        </a>
+
+        <a href="{% url 'logout' %}" class="nav-link logout-link"> Logout </a>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+
+    <main class="history-container">
+      <!-- Page heading -->
+
+      <section class="history-header">
+        <p class="dashboard-label">MAINTENANCE RECORDS</p>
+
+        <h1>Maintenance History</h1>
+
+        <p>
+          Review your previously completed maintenance requests and repair
+          records.
+        </p>
+      </section>
+
+      {% if history %}
+
+      <section class="history-list">
         {% for request in history %}
 
-            <hr>
+        <article class="history-card">
+          <!-- Header -->
 
-            <h2>
+          <div class="history-card-header">
+            <div>
+              <p class="history-number">COMPLETED REQUEST #{{ request.id }}</p>
+
+              <h2>
                 <a href="{% url 'request_detail' request.id %}">
-                    {{ request.problem_title }}
+                  {{ request.problem_title }}
                 </a>
-            </h2>
+              </h2>
+            </div>
 
-            <p>
-                <strong>Category:</strong>
+            <span class="status-badge status-completed">
+              {{ request.get_status_display }}
+            </span>
+          </div>
+
+          <!-- Information -->
+
+          <div class="history-info-grid">
+            <div class="history-info-item">
+              <span class="history-label"> Category </span>
+
+              <span class="history-value">
                 {{ request.get_category_display }}
-            </p>
+              </span>
+            </div>
 
-            <p>
-                <strong>Priority:</strong>
+            <div class="history-info-item">
+              <span class="history-label"> Priority </span>
+
+              <span class="history-value">
                 {{ request.get_priority_display }}
-            </p>
+              </span>
+            </div>
 
-            <p>
-                <strong>Status:</strong>
-                {{ request.get_status_display }}
-            </p>
+            <div class="history-info-item">
+              <span class="history-label"> Date Submitted </span>
 
-            <p>
-                <strong>Date Submitted:</strong>
-                {{ request.date_submitted }}
-            </p>
+              <span class="history-value">
+                {{ request.date_submitted|date:"M d, Y" }}
+              </span>
+            </div>
 
             {% if request.date_completed %}
-                <p>
-                    <strong>Date Completed:</strong>
-                    {{ request.date_completed }}
-                </p>
-            {% endif %}
 
-            {% if request.repair_notes %}
-                <p>
-                    <strong>Repair Notes:</strong>
-                    {{ request.repair_notes }}
-                </p>
+            <div class="history-info-item">
+              <span class="history-label"> Date Completed </span>
+
+              <span class="history-value history-completed">
+                {{ request.date_completed|date:"M d, Y" }}
+              </span>
+            </div>
+
             {% endif %}
+          </div>
+
+          <!-- Repair notes -->
+
+          {% if request.repair_notes %}
+
+          <div class="history-notes">
+            <span class="history-label"> Repair Notes </span>
+
+            <p>{{ request.repair_notes }}</p>
+          </div>
+
+          {% endif %}
+
+          <!-- Footer -->
+
+          <div class="history-card-footer">
+            <a
+              href="{% url 'request_detail' request.id %}"
+              class="request-details-link"
+            >
+              View Full Record →
+            </a>
+          </div>
+        </article>
 
         {% endfor %}
+      </section>
 
-    {% else %}
+      {% else %}
 
-        <p>You do not have any completed maintenance requests yet.</p>
+      <!-- Empty state -->
 
-    {% endif %}
+      <section class="empty-history">
+        <div class="history-empty-icon">✓</div>
 
-</body>
+        <h2>No Completed Requests Yet</h2>
+
+        <p>
+          Your completed maintenance requests will appear here once a reported
+          issue has been resolved.
+        </p>
+
+        <a href="{% url 'my_requests' %}" class="btn-secondary">
+          View My Requests
+        </a>
+      </section>
+
+      {% endif %}
+    </main>
+
+    <!-- Footer -->
+
+    <footer class="rust-footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">RUST</div>
+
+          <p>Apartment Maintenance Portal</p>
+        </div>
+
+        <div class="footer-text">
+          <p>
+            A centralized platform for managing apartment maintenance requests.
+          </p>
+
+          <p class="footer-copyright">&copy; 2026 Rust. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

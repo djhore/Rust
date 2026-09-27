@@ -1,34 +1,165 @@
-<!DOCTYPE html>
+{% load static %}
+
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Rust - Tenant Registration</title>
-</head>
-<body>
-<!-- Step 5 — Create the registration page
-We're going to create an HTML template for the tenant registration form.
-So we don't have to manually write HTML for every field yet.
-The page should automatically display fields for:
-Username,First name,Last name,Email,Phone number,Apartment number,Password,Password confirmation -->
-    
-    <h1>Create Your Rust Account</h1>
 
-    <p>Register as a tenant to submit and track maintenance requests.</p>
+    <!-- Rust fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <form method="POST">
-        {% csrf_token %}
-<!-- adds Django's security protection to the form. -->
-        {{ form.as_p }}
-<!-- tells Django:
-Display all the fields from TenantRegistrationForm. -->
-        <button type="submit">Create Account</button>
-    </form>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <p>
-        Already have an account?
-       <a href="{% url 'login' %}">Login</a>
-    </p>
+    <!-- Rust stylesheet -->
+    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}" />
+  </head>
 
-</body>
+  <body class="register-page">
+    <main class="register-container">
+      <section class="register-card">
+        <!-- Header -->
+
+        <div class="register-header">
+          <svg
+            class="register-logo"
+            viewBox="0 0 120 100"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Rust apartment maintenance logo"
+          >
+            <defs>
+              <linearGradient
+                id="rustMetalRegister"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stop-color="#F0A06A" />
+                <stop offset="30%" stop-color="#D97744" />
+                <stop offset="65%" stop-color="#B7410E" />
+                <stop offset="100%" stop-color="#7A2709" />
+              </linearGradient>
+            </defs>
+
+            <path
+              d="M12 88
+                           V30
+                           L45 12
+                           V88"
+              fill="none"
+              stroke="url(#rustMetalRegister)"
+              stroke-width="7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+            <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A" />
+            <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744" />
+            <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744" />
+            <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E" />
+            <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E" />
+            <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A" />
+
+            <path
+              d="M12 28 L30 18 L48 10"
+              fill="none"
+              stroke="url(#rustMetalRegister)"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+            <path
+              d="
+                            M68 29
+                            C60 29 54 35 54 43
+                            C54 49 58 54 63 56
+                            L49 78
+                            C47 82 48 86 52 88
+                            C56 90 60 87 62 84
+                            L76 62
+                            C82 64 88 61 91 56
+                            C95 50 94 43 90 39
+                            L80 49
+                            L73 42
+                            L83 32
+                            C78 29 73 28 68 29
+                            Z
+                        "
+              fill="none"
+              stroke="url(#rustMetalRegister)"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <h1>Rust</h1>
+
+          <p>Apartment Maintenance Portal</p>
+        </div>
+
+        <!-- Registration content -->
+
+        <div class="register-content">
+          <div class="register-intro">
+            <p class="dashboard-label">TENANT REGISTRATION</p>
+
+            <h2>Create Your Account</h2>
+
+            <p>
+              Register as a tenant to submit and track your apartment
+              maintenance requests.
+            </p>
+          </div>
+
+          <!-- Registration form -->
+
+          <form method="POST" class="registration-form">
+            {% csrf_token %} {{ form.as_p }}
+
+            <button type="submit" class="btn-primary register-button">
+              Create Account
+            </button>
+          </form>
+
+          <!-- Login link -->
+
+          <div class="register-login">
+            <p>
+              Already have an account?
+              <a href="{% url 'login' %}"> Login </a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+
+    <footer class="rust-footer register-footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">RUST</div>
+
+          <p>Apartment Maintenance Portal</p>
+        </div>
+
+        <div class="footer-text">
+          <p>
+            A centralized platform for managing apartment maintenance requests.
+          </p>
+
+          <p class="footer-copyright">&copy; 2026 Rust. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
 </html>

@@ -1,43 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Rust - Login</title>
-</head>
-<body>
 
-    <h1>Login to Rust</h1>
+    {% load static %}
 
-    <p>Sign in to access your Rust account.</p>
-<!-- allows Rust to display messages from our login view, such as:
-Invalid username or password. -->
-    {% if messages %} 
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+    <!-- Rust brand and interface fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <form method="POST">
-        {% csrf_token %}
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
 
-        <p>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </p>
+    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}" />
+  </head>
 
-        <p>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </p>
+  <body>
+    <div class="login-page">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="rust-brand">
+            <svg
+              class="rust-logo"
+              viewBox="0 0 120 100"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-label="Rust apartment maintenance logo"
+            >
+              <defs>
+                <!-- Rust metal colour -->
+                <linearGradient
+                  id="rustMetal"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stop-color="#F0A06A" />
+                  <stop offset="30%" stop-color="#D97744" />
+                  <stop offset="65%" stop-color="#B7410E" />
+                  <stop offset="100%" stop-color="#7A2709" />
+                </linearGradient>
+              </defs>
 
-        <button type="submit">Login</button>
-    </form>
+              <!-- =========================
+         APARTMENT BUILDING
+         ========================= -->
 
-    <p>
-        Don't have an account?
-        <a href="{% url 'register' %}">Register</a>
-    </p>
+              <path
+                d="M12 88
+           V30
+           L45 12
+           V88"
+                fill="none"
+                stroke="url(#rustMetal)"
+                stroke-width="7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
 
-</body>
+              <!-- Building windows -->
+
+              <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A" />
+
+              <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744" />
+
+              <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744" />
+
+              <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E" />
+
+              <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E" />
+
+              <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A" />
+
+              <!-- =========================
+         MAINTENANCE WRENCH
+         ========================= -->
+
+              <path
+                d="
+            M68 29
+
+            C60 29
+            54 35
+            54 43
+
+            C54 49
+            58 54
+            63 56
+
+            L49 78
+
+            C47 82
+            48 86
+            52 88
+
+            C56 90
+            60 87
+            62 84
+
+            L76 62
+
+            C82 64
+            88 61
+            91 56
+
+            C95 50
+            94 43
+            90 39
+
+            L80 49
+            L73 42
+            L83 32
+
+            C78 29
+            73 28
+            68 29
+
+            Z
+        "
+                fill="none"
+                stroke="url(#rustMetal)"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            <div class="rust-brand-text">
+              <h1>Rust</h1>
+              <p>Apartment Maintenance Portal</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-content">
+          <h2>Welcome Back</h2>
+          <p class="login-description">Sign in to access your Rust account.</p>
+
+          <!-- Display messages from the login view -->
+          {% if messages %} {% for message in messages %}
+          <div class="alert alert-error">{{ message }}</div>
+          {% endfor %} {% endif %}
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                class="form-control"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary login-button">
+              Login
+            </button>
+          </form>
+
+          <p class="register-link">
+            Don't have an account?
+            <a href="{% url 'register' %}">Create an account</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
