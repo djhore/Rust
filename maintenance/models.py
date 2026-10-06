@@ -27,6 +27,27 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.get_role_display()}"
 
+class RoleVerificationCode(models.Model):
+    ROLE_CHOICES = [
+        ('tenant', 'Tenant'),
+        ('manager', 'Property Manager'),
+        ('technician', 'Maintenance Technician'),
+    ]
+
+    code = models.CharField(max_length=30, unique=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    is_used = models.BooleanField(default=False)
+    used_by = models.OneToOneField(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='role_verification_code'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.code} - {self.get_role_display()}"
 
 class MaintenanceRequest(models.Model):
     CATEGORY_CHOICES = [

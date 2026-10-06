@@ -2631,3 +2631,14 @@ th {
     }
 
 }
+
+.btn-danger {
+    background-color: #a52620;
+    color: white;
+    border: 1px solid #a52620;
+}
+
+.btn-danger:hover {
+    background-color: #7f1d1d;
+    color: white;
+}

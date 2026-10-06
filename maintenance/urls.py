@@ -18,4 +18,29 @@ urlpatterns = [
     views.maintenance_history,
     name='maintenance_history'
     ),
+    path(
+    'manager/requests/',
+    views.manager_requests,
+    name='manager_requests'
+    ),
+    path(
+    'profile/',
+    views.profile,
+    name='profile'
+    ),
+    path(
+    'profile/edit/',
+    views.edit_profile,
+    name='edit_profile'
+    ),
+    path(
+    'profile/change-password/',
+    views.change_password,
+    name='change_password'
+    ),
+    path(
+    'profile/delete/',
+    views.delete_account,
+    name='delete_account'
+    ),
 ]

@@ -1,0 +1,282 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Rust - Edit Profile</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'maintenance/style.css' %}"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+    <nav class="rust-navbar">
+
+        <div class="rust-navbar-brand">
+
+            <div>
+
+                <div class="rust-navbar-title">
+                    Rust
+                </div>
+
+                <div class="rust-navbar-subtitle">
+                    Apartment Maintenance
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="rust-navbar-links">
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+            <a
+                href="{% url 'profile' %}"
+                class="nav-link active"
+            >
+                Profile
+            </a>
+
+            <a
+                href="{% url 'logout' %}"
+                class="nav-link logout-link"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="dashboard-container">
+
+        <div class="page-header">
+
+            <div>
+
+                <p class="section-label">
+                    RUST ACCOUNT
+                </p>
+
+                <h1>Edit Profile</h1>
+
+                <p>
+                    Update your Rust account information.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-card">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                {% if form.errors %}
+
+                    <div class="alert alert-error">
+
+                        Please correct the errors below.
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.username.id_for_label }}">
+                        Username
+                    </label>
+
+                    {{ form.username }}
+
+                    {% if form.username.errors %}
+                        <div class="field-error">
+                            {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.first_name.id_for_label }}">
+                        First Name
+                    </label>
+
+                    {{ form.first_name }}
+
+                    {% if form.first_name.errors %}
+                        <div class="field-error">
+                            {{ form.first_name.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.last_name.id_for_label }}">
+                        Last Name
+                    </label>
+
+                    {{ form.last_name }}
+
+                    {% if form.last_name.errors %}
+                        <div class="field-error">
+                            {{ form.last_name.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.email.id_for_label }}">
+                        Email
+                    </label>
+
+                    {{ form.email }}
+
+                    {% if form.email.errors %}
+                        <div class="field-error">
+                            {{ form.email.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.phone_number.id_for_label }}">
+                        Phone Number
+                    </label>
+
+                    {{ form.phone_number }}
+
+                    {% if form.phone_number.errors %}
+                        <div class="field-error">
+                            {{ form.phone_number.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                {% if form.apartment_number %}
+
+                    <div class="form-group">
+
+                        <label for="{{ form.apartment_number.id_for_label }}">
+                            Apartment Number
+                        </label>
+
+                        {{ form.apartment_number }}
+
+                        {% if form.apartment_number.errors %}
+                            <div class="field-error">
+                                {{ form.apartment_number.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="profile-actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Save Changes
+                    </button>
+
+                    <a
+                        href="{% url 'profile' %}"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <footer class="rust-footer">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+
+                <div class="footer-logo">
+                    RUST
+                </div>
+
+                <p>
+                    Apartment Maintenance Portal
+                </p>
+
+            </div>
+
+            <div class="footer-text">
+
+                <p>
+                    A centralized platform for managing apartment
+                    maintenance requests.
+                </p>
+
+                <p class="footer-copyright">
+                    &copy; 2026 Rust. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

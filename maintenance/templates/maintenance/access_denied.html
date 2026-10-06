@@ -1,0 +1,121 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rust - Access Denied</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'maintenance/style.css' %}"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+    <nav class="rust-navbar">
+
+        <div class="rust-navbar-brand">
+
+            <div>
+                <div class="rust-navbar-title">
+                    Rust
+                </div>
+
+                <div class="rust-navbar-subtitle">
+                    Apartment Maintenance
+                </div>
+            </div>
+
+        </div>
+
+        <div class="rust-navbar-links">
+
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="{% url 'logout' %}" class="nav-link logout-link">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="dashboard-container">
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                🔒
+            </div>
+
+            <h1>Access Denied</h1>
+
+            <p>
+                You do not have permission to access this page.
+            </p>
+
+            <p>
+                Please use the pages available for your account role.
+            </p>
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="btn btn-primary"
+            >
+                Return to Dashboard
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <footer class="rust-footer">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+
+                <div class="footer-logo">
+                    RUST
+                </div>
+
+                <p>
+                    Apartment Maintenance Portal
+                </p>
+
+            </div>
+
+            <div class="footer-text">
+
+                <p>
+                    A centralized platform for managing apartment
+                    maintenance requests.
+                </p>
+
+                <p class="footer-copyright">
+                    &copy; 2026 Rust. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>
