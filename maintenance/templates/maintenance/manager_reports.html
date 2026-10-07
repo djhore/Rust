@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Rust - Maintenance Reports</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    {% load static %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'maintenance/style.css' %}"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+
+    <!-- Navigation -->
+
+    <nav class="rust-navbar">
+
+        <div class="rust-navbar-brand">
+
+            <svg
+                class="rust-navbar-logo"
+                viewBox="0 0 120 100"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-label="Rust apartment maintenance logo">
+
+                <defs>
+                    <linearGradient
+                        id="managerRustMetal"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%">
+
+                        <stop offset="0%" stop-color="#F0A06A"/>
+                        <stop offset="30%" stop-color="#D97744"/>
+                        <stop offset="65%" stop-color="#B7410E"/>
+                        <stop offset="100%" stop-color="#7A2709"/>
+
+                    </linearGradient>
+                </defs>
+
+                <path
+                    d="M12 88 V30 L45 12 V88"
+                    fill="none"
+                    stroke="url(#managerRustMetal)"
+                    stroke-width="7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+
+                <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A"/>
+                <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744"/>
+                <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744"/>
+                <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E"/>
+                <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E"/>
+                <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A"/>
+
+                <path
+                    d="M12 28 L30 18 L48 10"
+                    fill="none"
+                    stroke="url(#managerRustMetal)"
+                    stroke-width="6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+
+                <path
+                    d="
+                        M68 29
+                        C60 29 54 35 54 43
+                        C54 49 58 54 63 56
+                        L49 78
+                        C47 82 48 86 52 88
+                        C56 90 60 87 62 84
+                        L76 62
+                        C82 64 88 61 91 56
+                        C95 50 94 43 90 39
+                        L80 49
+                        L73 42
+                        L83 32
+                        C78 29 73 28 68 29
+                        Z
+                    "
+                    fill="none"
+                    stroke="url(#managerRustMetal)"
+                    stroke-width="6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+
+            </svg>
+
+
+            <div>
+
+                <div class="rust-navbar-title">
+                    Rust
+                </div>
+
+                <div class="rust-navbar-subtitle">
+                    Apartment Maintenance
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="rust-navbar-links">
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+            <a
+                href="{% url 'manager_requests' %}"
+                class="nav-link"
+            >
+                Maintenance Requests
+            </a>
+
+            <a
+                href="{% url 'manager_technicians' %}"
+                class="nav-link"
+            >
+                Technicians
+            </a>
+
+            <a
+                href="{% url 'manager_reports' %}"
+                class="nav-link active"
+            >
+                Reports
+            </a>
+
+            <a
+                href="{% url 'profile' %}"
+                class="nav-link"
+            >
+                Profile
+            </a>
+
+            <a
+                href="{% url 'logout' %}"
+                class="nav-link logout-link"
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+
+    <main class="dashboard-container">
+
+
+        <div class="page-header">
+
+            <div>
+
+                <div class="section-label">
+                    MANAGEMENT
+                </div>
+
+                <h1>
+                    Maintenance Reports
+                </h1>
+
+                <p>
+                    View maintenance activity and basic management statistics.
+                </p>
+
+            </div>
+
+        </div>
+
+
+       <section class="requests-section">
+
+    <div class="section-heading">
+        <h2>Maintenance Summary</h2>
+
+        <p>
+            Summary of maintenance requests by current status.
+        </p>
+    </div>
+
+    <div class="requests-table-container">
+
+        <table class="requests-table">
+
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Number of Requests</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>
+                        <span class="status-badge status-pending">
+                            Pending
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>{{ pending_requests }}</strong>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <span class="status-badge status-assigned">
+                            Assigned
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>{{ assigned_requests }}</strong>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <span class="status-badge status-in-progress">
+                            In Progress
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>{{ in_progress_requests }}</strong>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <span class="status-badge status-completed">
+                            Completed
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>{{ completed_requests }}</strong>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <strong>Total Requests</strong>
+                    </td>
+
+                    <td>
+                        <strong>{{ total_requests }}</strong>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+        <!-- Priority -->
+
+        <section class="profile-card"
+        class="report-card priority-report">
+
+            <h2>
+                Request Priority
+            </h2>
+
+            <p>
+                Distribution of maintenance requests according to priority.
+            </p>
+
+            <div class="priority-list">
+
+                {% for item in priority_data %}
+
+                    <div class="priority-row">
+
+                        <span>
+                            {{ item.priority|title }}
+                        </span>
+
+                        <strong>
+                            {{ item.total }}
+                        </strong>
+
+                    </div>
+
+                {% empty %}
+
+                    <p>
+                        No maintenance request data available.
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <!-- Charts -->
+
+        <section class="reports-grid">
+
+
+            <div class="profile-card">
+
+                <h2>
+                    Request Status
+                </h2>
+
+                <p>
+                    Number of maintenance requests by status.
+                </p>
+
+                <div class="chart-container">
+
+                    <canvas id="statusChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-card">
+
+                <h2>
+                    Request Categories
+                </h2>
+
+                <p>
+                    Number of requests by maintenance category.
+                </p>
+
+                <div class="chart-container">
+
+                    <canvas id="categoryChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+
+    <footer class="rust-footer">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+
+                <div class="footer-logo">
+                    RUST
+                </div>
+
+                <p>
+                    Apartment Maintenance Portal
+                </p>
+
+            </div>
+
+            <div class="footer-text">
+
+                <p>
+                    A centralized platform for managing apartment maintenance requests.
+                </p>
+
+                <p class="footer-copyright">
+                    &copy; 2026 Rust. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+   <!-- Chart Data -->
+
+{{ status_data|json_script:"status-data" }}
+
+{{ category_data|json_script:"category-data" }}
+
+
+<script>
+
+    /* =========================
+       STATUS DATA
+       ========================= */
+
+    const statusData = JSON.parse(
+        document.getElementById('status-data').textContent
+    );
+
+    const statusLabels = statusData.map(
+        item => item.status
+    );
+
+    const statusValues = statusData.map(
+        item => item.total
+    );
+
+
+    /* =========================
+       CATEGORY DATA
+       ========================= */
+
+    const categoryData = JSON.parse(
+        document.getElementById('category-data').textContent
+    );
+
+    const categoryLabels = categoryData.map(
+        item => item.category
+    );
+
+    const categoryValues = categoryData.map(
+        item => item.total
+    );
+
+
+    /* =========================
+       STATUS CHART
+       ========================= */
+
+    new Chart(
+        document.getElementById('statusChart'),
+        {
+            type: 'bar',
+
+            data: {
+
+                labels: statusLabels,
+
+                datasets: [
+                    {
+                        label: 'Maintenance Requests',
+
+                        data: statusValues,
+
+                        borderWidth: 1
+                    }
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =========================
+       CATEGORY CHART
+       ========================= */
+
+    new Chart(
+        document.getElementById('categoryChart'),
+        {
+            type: 'doughnut',
+
+            data: {
+
+                labels: categoryLabels,
+
+                datasets: [
+                    {
+                        label: 'Requests',
+
+                        data: categoryValues,
+
+                        borderWidth: 1
+                    }
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false
+
+            }
+
+        }
+    );
+
+</script>
+</body>
+
+</html>

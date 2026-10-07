@@ -7,10 +7,15 @@ from .forms import (
     TenantRegistrationForm,
     MaintenanceRequestForm,
     ProfileUpdateForm,
+    AssignTechnicianForm,
+    ChangePriorityForm,
 )
 from .models import UserProfile, MaintenanceRequest, RoleVerificationCode
 from .decorators import manager_required,tenant_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.utils import timezone
+from django.contrib.auth.models import User
+from django.db.models import Count
 
 def register(request):
 
@@ -235,37 +240,6 @@ def change_password(request):
         'maintenance/change_password.html'
     )
 
-@login_required
-def delete_account(request):
-
-    if request.method == 'POST':
-
-        password = request.POST.get('password', '')
-
-        if not request.user.check_password(password):
-            messages.error(
-                request,
-                'Incorrect password. Your account was not deactivated.'
-            )
-        else:
-            user = request.user
-
-            user.is_active = False
-            user.save(update_fields=['is_active'])
-
-            auth_logout(request)
-
-            messages.success(
-                request,
-                'Your Rust account has been deactivated.'
-            )
-
-            return redirect('login')
-
-    return render(
-        request,
-        'maintenance/delete_account.html'
-    )
 
 @login_required
 def dashboard(request):
@@ -312,7 +286,223 @@ def manager_requests(request):
             'requests': requests,
         }
     )
+@manager_required
+def manager_request_detail(request, request_id):
+    maintenance_request = get_object_or_404(
+        MaintenanceRequest,
+        id=request_id
+    )
 
+    return render(
+        request,
+        'maintenance/manager_request_detail.html',
+        {'maintenance_request': maintenance_request}
+    )
+
+@manager_required
+def assign_technician(request, request_id):
+    maintenance_request = get_object_or_404(
+        MaintenanceRequest,
+        id=request_id
+    )
+
+    if maintenance_request.status != 'pending':
+        messages.error(
+            request,
+            'Only pending maintenance requests can be assigned.'
+        )
+        return redirect(
+            'manager_request_detail',
+            request_id=request_id
+        )
+
+    if request.method == 'POST':
+        form = AssignTechnicianForm(
+            request.POST,
+            instance=maintenance_request
+        )
+
+        if form.is_valid():
+            maintenance_request = form.save(commit=False)
+
+            maintenance_request.status = 'assigned'
+            maintenance_request.date_assigned = timezone.now()
+
+            maintenance_request.save()
+
+            messages.success(
+                request,
+                'The maintenance request has been assigned successfully.'
+            )
+
+            return redirect(
+                'manager_request_detail',
+                request_id=request_id
+            )
+
+    else:
+        form = AssignTechnicianForm(
+            instance=maintenance_request
+        )
+
+    return render(
+        request,
+        'maintenance/assign_technician.html',
+        {
+            'form': form,
+            'maintenance_request': maintenance_request,
+        }
+    )
+
+@manager_required
+def change_priority(request, request_id):
+    maintenance_request = get_object_or_404(
+        MaintenanceRequest,
+        id=request_id
+    )
+
+    if request.method == 'POST':
+        form = ChangePriorityForm(
+            request.POST,
+            instance=maintenance_request
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                'The maintenance request priority has been updated successfully.'
+            )
+
+            return redirect(
+                'manager_request_detail',
+                request_id=request_id
+            )
+
+    else:
+        form = ChangePriorityForm(
+            instance=maintenance_request
+        )
+
+    return render(
+        request,
+        'maintenance/change_priority.html',
+        {
+            'form': form,
+            'maintenance_request': maintenance_request,
+        }
+    )
+
+@manager_required
+def manager_technicians(request):
+    technicians = User.objects.filter(
+        userprofile__role='technician',
+        is_active=True
+    ).order_by('username')
+
+    return render(
+        request,
+        'maintenance/manager_technicians.html',
+        {'technicians': technicians}
+    )
+
+@manager_required
+def manager_users(request):
+    users = UserProfile.objects.select_related('user').all().order_by('role')
+
+    return render(
+        request,
+        'maintenance/manager_users.html',
+        {'users': users}
+    )
+
+@manager_required
+def manager_reports(request):
+    total_requests = MaintenanceRequest.objects.count()
+
+    pending_requests = MaintenanceRequest.objects.filter(
+        status='pending'
+    ).count()
+
+    assigned_requests = MaintenanceRequest.objects.filter(
+        status='assigned'
+    ).count()
+
+    in_progress_requests = MaintenanceRequest.objects.filter(
+        status='in_progress'
+    ).count()
+
+    completed_requests = MaintenanceRequest.objects.filter(
+        status='completed'
+    ).count()
+
+    category_data = (
+        MaintenanceRequest.objects
+        .values('category')
+        .annotate(total=Count('id'))
+        .order_by('category')
+    )
+
+    priority_data = (
+        MaintenanceRequest.objects
+        .values('priority')
+        .annotate(total=Count('id'))
+        .order_by('priority')
+    )
+
+    status_data = [
+        {
+            'status': 'Pending',
+            'total': pending_requests
+        },
+        {
+            'status': 'Assigned',
+            'total': assigned_requests
+        },
+        {
+            'status': 'In Progress',
+            'total': in_progress_requests
+        },
+        {
+            'status': 'Completed',
+            'total': completed_requests
+        },
+    ]
+
+    context = {
+    'total_requests': total_requests,
+    'pending_requests': pending_requests,
+    'assigned_requests': assigned_requests,
+    'in_progress_requests': in_progress_requests,
+    'completed_requests': completed_requests,
+    'category_data': list(category_data),
+    'priority_data': list(priority_data),
+
+    'status_data': [
+        {
+            'status': 'Pending',
+            'total': pending_requests
+        },
+        {
+            'status': 'Assigned',
+            'total': assigned_requests
+        },
+        {
+            'status': 'In Progress',
+            'total': in_progress_requests
+        },
+        {
+            'status': 'Completed',
+            'total': completed_requests
+        },
+    ],
+    }
+    return render(
+        request,
+        'maintenance/manager_reports.html',
+        context
+    )
 @tenant_required
 def my_requests(request):
     requests = MaintenanceRequest.objects.filter(

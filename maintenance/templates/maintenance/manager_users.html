@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rust - Manage Users</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    {% load static %}
+
+    <link
+        rel="stylesheet"
+        href="{% static 'maintenance/style.css' %}"
+    >
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="rust-navbar">
+
+        <div class="rust-navbar-brand">
+
+            <svg
+            class="rust-navbar-logo"
+            viewBox="0 0 120 100"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Rust apartment maintenance logo"
+        >
+            <defs>
+                <linearGradient
+                    id="rustMetalManagerRequests"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                >
+                    <stop offset="0%" stop-color="#F0A06A" />
+                    <stop offset="30%" stop-color="#D97744" />
+                    <stop offset="65%" stop-color="#B7410E" />
+                    <stop offset="100%" stop-color="#7A2709" />
+                </linearGradient>
+            </defs>
+
+            <path
+                d="M12 88 V30 L45 12 V88"
+                fill="none"
+                stroke="url(#rustMetalManagerRequests)"
+                stroke-width="7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+
+            <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A" />
+            <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744" />
+            <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744" />
+            <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E" />
+            <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E" />
+            <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A" />
+
+            <path
+                d="M12 28 L30 18 L48 10"
+                fill="none"
+                stroke="url(#rustMetalManagerRequests)"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+
+            <path
+                d="
+                    M68 29
+                    C60 29 54 35 54 43
+                    C54 49 58 54 63 56
+                    L49 78
+                    C47 82 48 86 52 88
+                    C56 90 60 87 62 84
+                    L76 62
+                    C82 64 88 61 91 56
+                    C95 50 94 43 90 39
+                    L80 49
+                    L73 42
+                    L83 32
+                    C78 29 73 28 68 29
+                    Z
+                "
+                fill="none"
+                stroke="url(#rustMetalManagerRequests)"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+        </svg>
+
+            <div>
+                <div class="rust-navbar-title">Rust</div>
+                <div class="rust-navbar-subtitle">
+                    Apartment Maintenance
+                </div>
+            </div>
+
+        </div>
+
+        <div class="rust-navbar-links">
+
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="{% url 'manager_requests' %}" class="nav-link">
+                Maintenance Requests
+            </a>
+
+            <a href="{% url 'manager_technicians' %}" class="nav-link">
+                Technicians
+            </a>
+
+           <a
+              href="{% url 'manager_reports' %}"
+              class="nav-link"
+            >
+                Reports
+            </a>
+
+            <a href="{% url 'profile' %}" class="nav-link">
+                Profile
+            </a>
+
+            <a href="{% url 'logout' %}" class="nav-link logout-link">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="dashboard-container">
+
+        <div class="page-header">
+
+            <div>
+                <div class="section-label">
+                    USER MANAGEMENT
+                </div>
+
+                <h1>Manage Users</h1>
+
+                <p>
+                    View tenant and maintenance staff information.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- Users Section -->
+        <section class="requests-section">
+
+            <div class="section-heading">
+                <h2>Registered Users</h2>
+
+                <p>
+                    View the users currently registered in Rust.
+                </p>
+            </div>
+
+
+            <div class="requests-table-container">
+
+                <table class="requests-table">
+
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Apartment</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for profile in users %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ profile.user.username }}
+                                </strong>
+
+                                <br>
+
+                                <span>
+                                    {{ profile.user.first_name }}
+                                    {{ profile.user.last_name }}
+                                </span>
+                            </td>
+
+
+                            <td>
+
+                                {% if profile.role == 'tenant' %}
+
+                                    <span class="status-badge">
+                                        Tenant
+                                    </span>
+
+                                {% elif profile.role == 'manager' %}
+
+                                    <span class="status-badge">
+                                        Property Manager
+                                    </span>
+
+                                {% elif profile.role == 'technician' %}
+
+                                    <span class="status-badge">
+                                        Technician
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ profile.user.email }}
+                            </td>
+
+
+                            <td>
+                                {{ profile.phone_number|default:"—" }}
+                            </td>
+
+
+                            <td>
+                                {{ profile.apartment_number|default:"—" }}
+                            </td>
+
+
+                            <td>
+
+                                {% if profile.user.is_active %}
+
+                                    <span class="status-badge status-completed">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-pending">
+                                        Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="6">
+                                No users have been registered yet.
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="rust-footer">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+
+                <div class="footer-logo">
+                    RUST
+                </div>
+
+                <p>
+                    Apartment Maintenance Portal
+                </p>
+
+            </div>
+
+            <div class="footer-text">
+
+                <p>
+                    A centralized platform for managing apartment maintenance requests.
+                </p>
+
+                <p class="footer-copyright">
+                    &copy; 2026 Rust. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>

@@ -123,20 +123,26 @@
                 Dashboard
             </a>
 
-            <a href="#"
-               class="nav-link">
-                Maintenance Requests
-            </a>
+                 <a
+                    href="{% url 'manager_requests' %}"
+                    class="nav-link"
+                >
+                    Maintenance Requests
+                </a>
 
-            <a href="#"
-               class="nav-link">
-                Technicians
-            </a>
+                <a
+                    href="{% url 'manager_technicians' %}"
+                    class="nav-link"
+                >
+                    Technicians
+                </a>
 
-            <a href="#"
-               class="nav-link">
-                Reports
-            </a>
+                <a
+                   href="{% url 'manager_reports' %}"
+                    class="nav-link"
+                >
+                    Reports
+                </a>
 
             <a href="{% url 'profile' %}" 
                 class="nav-link">
@@ -304,8 +310,9 @@
                 </a>
 
 
-                <a href="#"
-                   class="action-card">
+                <a  href="{% url 'manager_technicians' %}"
+                     class="action-card"
+                    >
 
                     <div class="action-icon">
                         👷
@@ -331,7 +338,7 @@
                 </a>
 
 
-                <a href="#"
+               <a href="{% url 'manager_reports' %}"
                    class="action-card">
 
                     <div class="action-icon">
@@ -358,7 +365,7 @@
                 </a>
 
 
-                <a href="#"
+               <a href="{% url 'manager_users' %}"
                    class="action-card">
 
                     <div class="action-icon">

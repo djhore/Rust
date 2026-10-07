@@ -113,11 +113,16 @@
             Maintenance Requests
         </a>
 
-        <a href="#" class="nav-link">
+       <a
+            href="{% url 'manager_technicians' %}"
+            class="nav-link"
+        >
             Technicians
         </a>
-
-        <a href="#" class="nav-link">
+        <a
+            href="{% url 'manager_reports' %}"
+            class="nav-link"
+        >
             Reports
         </a>
 
@@ -206,8 +211,10 @@
 
                                 <td>
 
-                                    <a href="#"
-                                       class="request-view-link">
+                                   <a
+                                        href="{% url 'manager_request_detail' request.id %}"
+                                        class="btn btn-secondary"
+                                    >
                                         View
                                     </a>
 

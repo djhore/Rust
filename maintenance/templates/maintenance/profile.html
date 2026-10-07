@@ -220,15 +220,15 @@
                     Maintenance Requests
                 </a>
 
-                <a
-                    href="#"
+               <a
+                    href="{% url 'manager_technicians' %}"
                     class="nav-link"
                 >
                     Technicians
                 </a>
 
-                <a
-                    href="#"
+                 <a
+                    href="{% url 'manager_reports' %}"
                     class="nav-link"
                 >
                     Reports
@@ -408,10 +408,7 @@
                     Change Password
                 </a>
 
-                <a href="{% url 'delete_account' %}"
-                    class="btn btn-danger">
-                        Deactivate Account
-                </a>
+                
             </div>
 
         </div>

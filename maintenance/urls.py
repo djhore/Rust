@@ -24,6 +24,36 @@ urlpatterns = [
     name='manager_requests'
     ),
     path(
+    'manager/requests/<int:request_id>/',
+    views.manager_request_detail,
+    name='manager_request_detail'
+    ),
+    path(
+    'manager/requests/<int:request_id>/assign/',
+    views.assign_technician,
+    name='assign_technician'
+    ),
+    path(
+    'manager/requests/<int:request_id>/priority/',
+    views.change_priority,
+    name='change_priority'
+    ),
+    path(
+    'manager/technicians/',
+    views.manager_technicians,
+    name='manager_technicians'
+    ),
+    path(
+    'manager/users/',
+    views.manager_users,
+    name='manager_users'
+    ),
+    path(
+    'manager/reports/',
+    views.manager_reports,
+    name='manager_reports'
+    ),
+    path(
     'profile/',
     views.profile,
     name='profile'
@@ -38,9 +68,5 @@ urlpatterns = [
     views.change_password,
     name='change_password'
     ),
-    path(
-    'profile/delete/',
-    views.delete_account,
-    name='delete_account'
-    ),
+   
 ]

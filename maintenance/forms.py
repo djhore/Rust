@@ -17,13 +17,42 @@ class TenantRegistrationForm(UserCreationForm):
 
     phone_number = forms.CharField(max_length=20)
 
-    apartment_number = forms.CharField(max_length=50)
+    apartment_number = forms.CharField(
+        max_length=50,
+        required=False
+    )
 
     role_code = forms.CharField(
         max_length=30,
         label="Role Verification Code",
         help_text="Enter the verification code provided to you."
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        role_code = cleaned_data.get('role_code')
+        apartment_number = cleaned_data.get('apartment_number')
+
+        if role_code:
+            try:
+                verification_code = RoleVerificationCode.objects.get(
+                    code=role_code
+                )
+
+                if (
+                    verification_code.role == 'tenant'
+                    and not apartment_number
+                ):
+                    self.add_error(
+                        'apartment_number',
+                        'Apartment number is required for tenants.'
+                    )
+
+            except RoleVerificationCode.DoesNotExist:
+                pass
+
+        return cleaned_data
 
     class Meta:
 
@@ -122,3 +151,31 @@ class ProfileUpdateForm(forms.ModelForm):
             )
 
         return username
+
+class AssignTechnicianForm(forms.ModelForm):
+
+    class Meta:
+        model = MaintenanceRequest
+        fields = ['assigned_technician']
+        labels = {
+            'assigned_technician': 'Assign Technician',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['assigned_technician'].queryset = User.objects.filter(
+            userprofile__role='technician',
+            is_active=True
+        )
+
+        self.fields['assigned_technician'].empty_label = 'Select a technician'
+
+class ChangePriorityForm(forms.ModelForm):
+
+    class Meta:
+        model = MaintenanceRequest
+        fields = ['priority']
+        labels = {
+            'priority': 'Request Priority',
+        }
