@@ -137,7 +137,7 @@
       <!-- Profile Card -->
       <section class="profile-card">
         <div class="profile-card-heading">
-          <h2>Your Profile</h2>
+          <h2>Tenant Details</h2>
         </div>
 
         <div class="profile-details">
@@ -156,10 +156,29 @@
           </div>
 
           <div class="profile-item">
+                <span class="profile-label">Email</span>
+                <span class="profile-value">
+                    {{ profile.user.email|default:"Not provided" }}
+                </span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">Phone</span>
+                <span class="profile-value">
+                    {{ profile.phone_number|default:"Not provided" }}
+                </span>
+            </div>
+
+          <div class="profile-item">
             <span class="profile-label">Role</span>
 
             <span class="profile-role"> {{ profile.get_role_display }} </span>
           </div>
+        </div>  
+          <div style="margin-top: 24px;">
+            <a href="{% url 'profile' %}" class="btn btn-secondary">
+                View Profile
+            </a>
         </div>
       </section>
 
@@ -174,7 +193,7 @@
         <div class="action-grid">
           <!-- Submit Request -->
           <a href="{% url 'submit_request' %}" class="action-card">
-            <div class="action-icon">+</div>
+            <div class="action-icon"> 🔧</div>
 
             <div>
               <h3>Submit Maintenance Request</h3>
@@ -187,7 +206,7 @@
 
           <!-- My Requests -->
           <a href="{% url 'my_requests' %}" class="action-card">
-            <div class="action-icon">✓</div>
+            <div class="action-icon">⚙️</div>
 
             <div>
               <h3>View My Requests</h3>
@@ -200,7 +219,7 @@
 
           <!-- Maintenance History -->
           <a href="{% url 'maintenance_history' %}" class="action-card">
-            <div class="action-icon">↺</div>
+            <div class="action-icon">📈</div>
 
             <div>
               <h3>Maintenance History</h3>

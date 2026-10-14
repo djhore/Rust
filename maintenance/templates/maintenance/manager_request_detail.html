@@ -244,6 +244,17 @@
 
                         </td>
                     </tr>
+                    
+                        <tr>
+                            <th> Technician Assigned</th>
+                            <td>
+                             {% if maintenance_request.assigned_technician %}
+                                {{ maintenance_request.assigned_technician.username }}
+                            {% else %}
+                                Not assigned
+                            {% endif %}
+                            </td>
+                            </tr>
 
 
                     <tr>

@@ -194,7 +194,7 @@
                     </p>
 
                     <h2>
-                        Manager Profile
+                        Manager Details
                     </h2>
                 </div>
 
@@ -242,6 +242,13 @@
 
                 </div>
 
+                    
+                <div class="profile-item">
+                    <span class="profile-label">Phone</span>
+                    <span class="profile-value">
+                        {{ profile.phone_number|default:"Not provided" }}
+                    </span>
+                </div>
 
                 <div class="profile-item">
 
@@ -256,7 +263,11 @@
                 </div>
 
             </div>
-
+                <div style="margin-top: 24px;">
+                    <a href="{% url 'profile' %}" class="btn btn-secondary">
+                        View Profile
+                    </a>
+                </div>
         </section>
 
 

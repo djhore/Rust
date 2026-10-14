@@ -53,6 +53,29 @@ urlpatterns = [
     views.manager_reports,
     name='manager_reports'
     ),
+    # path('technician/dashboard/', 
+    # views.technician_dashboard, 
+    # name='technician_dashboard'),
+    path(
+    'technician/requests/',
+    views.technician_requests,
+    name='technician_requests'
+    ),
+    path(
+    'technician/requests/<int:request_id>/',
+    views.technician_request_detail,
+    name='technician_request_detail'
+    ),
+    path(
+    'technician/requests/<int:request_id>/update/',
+    views.technician_update_request,
+    name='technician_update_request'
+    ),
+    path(
+    'technician/progress/',
+    views.technician_progress,
+    name='technician_progress'
+    ),
     path(
     'profile/',
     views.profile,

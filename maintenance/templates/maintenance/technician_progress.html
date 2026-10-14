@@ -1,0 +1,539 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust | Update Progress</title>
+    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}">
+
+    <style>
+        .progress-page {
+            max-width: 1160px;
+            width: calc(100% - 48px);
+            margin: 42px auto 55px;
+        }
+
+        .progress-heading {
+            margin-bottom: 30px;
+        }
+
+        .progress-heading .dashboard-label {
+            margin-bottom: 10px;
+        }
+
+        .progress-heading h1 {
+            font-size: 2.2rem;
+            line-height: 1.25;
+            margin: 0 0 12px;
+            color: #292524;
+        }
+
+        .progress-heading .dashboard-description {
+            max-width: 680px;
+            line-height: 1.7;
+        }
+
+        .progress-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 24px 28px;
+            background: #ffffff;
+            border: 1px solid #eadfd8;
+            border-radius: 14px;
+            margin-bottom: 34px;
+            box-shadow: 0 4px 15px rgba(41, 37, 36, 0.04);
+        }
+
+        .progress-summary-label {
+            color: #78716c;
+            font-size: 0.9rem;
+            margin: 0 0 6px;
+        }
+
+        .progress-summary-number {
+            color: #292524;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .progress-summary-icon {
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: #fbe8df;
+            border-radius: 12px;
+            font-size: 1.6rem;
+        }
+
+        .progress-section-heading {
+            margin-bottom: 18px;
+        }
+
+        .progress-section-heading .dashboard-label {
+            margin-bottom: 7px;
+        }
+
+        .progress-section-heading h2 {
+            margin: 0;
+            color: #292524;
+            font-size: 1.5rem;
+        }
+
+        .progress-request-list {
+            display: grid;
+            gap: 18px;
+        }
+
+        .progress-request-card {
+            background: #ffffff;
+            border: 1px solid #eadfd8;
+            border-radius: 14px;
+            padding: 24px 26px;
+            box-shadow: 0 4px 15px rgba(41, 37, 36, 0.04);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .progress-request-card:hover {
+            border-color: #d97744;
+            box-shadow: 0 7px 20px rgba(41, 37, 36, 0.07);
+        }
+
+        .progress-request-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .progress-request-id {
+            color: #b7410e;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin: 0 0 8px;
+        }
+
+        .progress-request-title {
+            font-size: 1.2rem;
+            color: #292524;
+            margin: 0 0 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .progress-request-category {
+            color: #78716c;
+            font-size: 0.92rem;
+            margin: 0;
+        }
+
+        .progress-request-details {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            padding: 18px 0;
+            border-top: 1px solid #f0e8e3;
+            border-bottom: 1px solid #f0e8e3;
+        }
+
+        .progress-detail-label {
+            display: block;
+            color: #78716c;
+            font-size: 0.82rem;
+            margin-bottom: 7px;
+        }
+
+        .progress-detail-value {
+            color: #292524;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .progress-request-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .progress-assigned-date {
+            color: #78716c;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .progress-update-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 17px;
+            background: #b7410e;
+            color: #ffffff;
+            border: 1px solid #b7410e;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .progress-update-link:hover {
+            background: #8f2d0a;
+            color: #ffffff;
+        }
+
+        .progress-empty {
+            text-align: center;
+            background: #ffffff;
+            border: 1px solid #eadfd8;
+            border-radius: 14px;
+            padding: 48px 24px;
+        }
+
+        .progress-empty-icon {
+            font-size: 2.4rem;
+            margin-bottom: 14px;
+        }
+
+        .progress-empty h3 {
+            color: #292524;
+            margin: 0 0 10px;
+        }
+
+        .progress-empty p {
+            max-width: 480px;
+            margin: 0 auto;
+            color: #78716c;
+            line-height: 1.7;
+        }
+
+        .progress-bottom-note {
+            margin-top: 30px;
+            padding: 25px 28px;
+            border-radius: 14px;
+            background: linear-gradient(115deg, #8f2d0a, #b7410e);
+            color: #ffffff;
+        }
+
+        .progress-bottom-note .dashboard-label {
+            color: #ffe0d1;
+            margin-bottom: 8px;
+        }
+
+        .progress-bottom-note h2 {
+            color: #ffffff;
+            margin: 0 0 10px;
+            font-size: 1.35rem;
+        }
+
+        .progress-bottom-note p:last-child {
+            margin-bottom: 0;
+            line-height: 1.7;
+            color: #fff4ed;
+        }
+
+        @media (max-width: 700px) {
+            .progress-page {
+                width: calc(100% - 32px);
+                margin: 28px auto 38px;
+            }
+
+            .progress-heading h1 {
+                font-size: 1.8rem;
+            }
+
+            .progress-summary {
+                padding: 20px;
+            }
+
+            .progress-request-card {
+                padding: 20px;
+            }
+
+            .progress-request-details {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px 12px;
+            }
+
+            .progress-request-footer {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .progress-update-link {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .progress-request-top {
+                flex-direction: column;
+            }
+
+            .progress-request-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<nav class="rust-navbar">
+
+    <div class="rust-navbar-brand">
+
+        <svg
+            class="rust-navbar-logo"
+            viewBox="0 0 120 100"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Rust apartment maintenance logo"
+        >
+            <defs>
+                <linearGradient
+                    id="rustMetalTechnician"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                >
+                    <stop offset="0%" stop-color="#F0A06A" />
+                    <stop offset="30%" stop-color="#D97744" />
+                    <stop offset="65%" stop-color="#B7410E" />
+                    <stop offset="100%" stop-color="#7A2709" />
+                </linearGradient>
+            </defs>
+
+            <path
+                d="M12 88 V30 L45 12 V88"
+                fill="none"
+                stroke="url(#rustMetalTechnician)"
+                stroke-width="7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+
+            <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A" />
+            <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744" />
+            <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744" />
+            <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E" />
+            <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E" />
+            <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A" />
+
+            <path
+                d="M12 28 L30 18 L48 10"
+                fill="none"
+                stroke="url(#rustMetalTechnician)"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+
+            <path
+                d="
+                    M68 29
+                    C60 29 54 35 54 43
+                    C54 49 58 54 63 56
+                    L49 78
+                    C47 82 48 86 52 88
+                    C56 90 60 87 62 84
+                    L76 62
+                    C82 64 88 61 91 56
+                    C95 50 94 43 90 39
+                    L80 49
+                    L73 42
+                    L83 32
+                    C78 29 73 28 68 29
+                    Z
+                "
+                fill="none"
+                stroke="url(#rustMetalTechnician)"
+                stroke-width="6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+        </svg>
+
+        <div>
+            <div class="rust-navbar-title">Rust</div>
+            <div class="rust-navbar-subtitle">
+                Apartment Maintenance
+            </div>
+        </div>
+
+    </div>
+
+    <div class="rust-navbar-links">
+
+        <a href="{% url 'dashboard' %}" class="nav-link active">
+            Dashboard
+        </a>
+
+        <a href="{% url 'technician_requests' %}" class="nav-link">
+            Assigned Requests
+        </a>
+
+        <a href="{% url 'profile' %}" class="nav-link">
+            Profile
+        </a>
+
+        <a href="{% url 'logout' %}" class="nav-link logout-link">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+    <main class="progress-page">
+
+        <header class="progress-heading">
+            <p class="dashboard-label">TECHNICIAN WORKSPACE</p>
+            <h1>Update Maintenance Progress</h1>
+            <p class="dashboard-description">
+                Manage your active maintenance jobs, record repair progress,
+                and keep request information up to date.
+            </p>
+        </header>
+
+        <section class="progress-summary">
+            <div>
+                <p class="progress-summary-label">Active maintenance requests</p>
+                <p class="progress-summary-number">{{ requests|length }}</p>
+            </div>
+            <div class="progress-summary-icon" aria-hidden="true">🔧</div>
+        </section>
+
+        <section>
+            <div class="progress-section-heading">
+                <p class="dashboard-label">YOUR WORKLOAD</p>
+                <h2>Requests Requiring Attention</h2>
+            </div>
+
+            {% if requests %}
+                <div class="progress-request-list">
+
+                    {% for maintenance_request in requests %}
+                        <article class="progress-request-card">
+
+                            <div class="progress-request-top">
+                                <div>
+                                    <p class="progress-request-id">
+                                        Request #{{ maintenance_request.id }}
+                                    </p>
+                                    <h3 class="progress-request-title">
+                                        {{ maintenance_request.problem_title }}
+                                    </h3>
+                                    <p class="progress-request-category">
+                                        {{ maintenance_request.get_category_display }}
+                                    </p>
+                                </div>
+
+                                <span class="status-badge status-{{ maintenance_request.status }}">
+                                    {{ maintenance_request.get_status_display }}
+                                </span>
+                            </div>
+
+                            <div class="progress-request-details">
+                                <div>
+                                    <span class="progress-detail-label">Priority</span>
+                                    <span class="progress-detail-value">
+                                        {{ maintenance_request.get_priority_display }}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="progress-detail-label">Date Assigned</span>
+                                    <span class="progress-detail-value">
+                                        {% if maintenance_request.date_assigned %}
+                                            {{ maintenance_request.date_assigned|date:"M d, Y" }}
+                                        {% else %}
+                                            Not recorded
+                                        {% endif %}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <span class="progress-detail-label">Tenant</span>
+                                    <span class="progress-detail-value">
+                                        {{ maintenance_request.tenant.get_full_name|default:maintenance_request.tenant.username }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="progress-request-footer">
+                                <span class="progress-assigned-date">
+                                    Submitted {{ maintenance_request.date_submitted|date:"M d, Y" }}
+                                </span>
+
+                                <a
+                                    href="{% url 'technician_request_detail' maintenance_request.id %}"
+                                    class="progress-update-link"
+                                >
+                                    Update Request <span aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
+
+                        </article>
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+                <div class="progress-empty">
+                    <div class="progress-empty-icon" aria-hidden="true">✓</div>
+                    <h3>You're all caught up!</h3>
+                    <p>
+                        You currently have no assigned maintenance jobs
+                        that require further work. New assignments will
+                        appear here when they are given to you.
+                    </p>
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="progress-bottom-note">
+            <p class="dashboard-label">RUST TECHNICIAN</p>
+            <h2>Keep Maintenance Records Updated</h2>
+            <p>
+                Open an assigned request to begin maintenance, record repair
+                notes, or mark completed work. Your updates are shared with
+                the property manager and reflected in the tenant's records.
+            </p>
+        </section>
+
+    </main>
+
+    <footer class="rust-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">RUST</div>
+                <p>Apartment Maintenance Portal</p>
+            </div>
+
+            <div class="footer-text">
+                <p>
+                    A centralized platform for managing apartment
+                    maintenance requests.
+                </p>
+                <p class="footer-copyright">
+                    &copy; 2026 Rust. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,446 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rust | Request Details</title>
+
+    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}">
+
+    <style>
+        .technician-details-page {
+            max-width: 1050px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .technician-details-header {
+            margin-bottom: 25px;
+        }
+
+        .technician-details-card {
+            background: #fff;
+            border: 1px solid #eadfd8;
+            border-radius: 14px;
+            padding: 26px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(41, 37, 36, 0.05);
+        }
+
+        .technician-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .technician-details-item {
+            min-width: 0;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #f0e8e3;
+        }
+
+        .technician-details-label {
+            display: block;
+            color: #78716c;
+            font-size: 0.88rem;
+            margin-bottom: 7px;
+        }
+
+        .technician-details-value {
+            color: #292524;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .technician-details-description {
+            line-height: 1.8;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .technician-details-image {
+            display: block;
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            object-position: left;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .technician-details-back {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 11px 18px;
+            color: #b7410e;
+            border: 1px solid #b7410e;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .technician-details-back:hover {
+            background: #f7f3f0;
+        }
+
+        @media (max-width: 650px) {
+            .technician-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .technician-details-card {
+                padding: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+        <nav class="rust-navbar">
+
+        <div class="rust-navbar-brand">
+
+            <svg
+                class="rust-navbar-logo"
+                viewBox="0 0 120 100"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-label="Rust apartment maintenance logo"
+            >
+                <defs>
+                    <linearGradient
+                        id="rustMetalTechnicianRequests"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                    >
+                        <stop offset="0%" stop-color="#F0A06A" />
+                        <stop offset="30%" stop-color="#D97744" />
+                        <stop offset="65%" stop-color="#B7410E" />
+                        <stop offset="100%" stop-color="#7A2709" />
+                    </linearGradient>
+                </defs>
+
+                <path
+                    d="M12 88 V30 L45 12 V88"
+                    fill="none"
+                    stroke="url(#rustMetalTechnicianRequests)"
+                    stroke-width="7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+
+                <rect x="22" y="36" width="7" height="8" rx="1" fill="#F0A06A" />
+                <rect x="34" y="30" width="7" height="8" rx="1" fill="#D97744" />
+                <rect x="22" y="51" width="7" height="8" rx="1" fill="#D97744" />
+                <rect x="34" y="45" width="7" height="8" rx="1" fill="#B7410E" />
+                <rect x="22" y="66" width="7" height="8" rx="1" fill="#B7410E" />
+                <rect x="34" y="60" width="7" height="8" rx="1" fill="#F0A06A" />
+
+                <path
+                    d="M12 28 L30 18 L48 10"
+                    fill="none"
+                    stroke="url(#rustMetalTechnicianRequests)"
+                    stroke-width="6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+
+                <path
+                    d="
+                        M68 29
+                        C60 29 54 35 54 43
+                        C54 49 58 54 63 56
+                        L49 78
+                        C47 82 48 86 52 88
+                        C56 90 60 87 62 84
+                        L76 62
+                        C82 64 88 61 91 56
+                        C95 50 94 43 90 39
+                        L80 49
+                        L73 42
+                        L83 32
+                        C78 29 73 28 68 29
+                        Z
+                    "
+                    fill="none"
+                    stroke="url(#rustMetalTechnicianRequests)"
+                    stroke-width="6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                />
+            </svg>
+
+            <div>
+                <div class="rust-navbar-title">Rust</div>
+                <div class="rust-navbar-subtitle">
+                    Apartment Maintenance
+                </div>
+            </div>
+
+        </div>
+
+        <div class="rust-navbar-links">
+
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="{% url 'technician_requests' %}" class="nav-link active">
+                Assigned Requests
+            </a>
+
+            <a href="{% url 'profile' %}" class="nav-link">
+                Profile
+            </a>
+
+            <a href="{% url 'logout' %}" class="nav-link logout-link">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="technician-details-page">
+        {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+        {% endif %}
+
+        <header class="technician-details-header">
+            <p class="dashboard-label">TECHNICIAN WORKSPACE</p>
+
+            <h1>{{ maintenance_request.problem_title }}</h1>
+
+            <p class="dashboard-description">
+                Review the maintenance request before carrying out the
+                assigned work.
+            </p>
+        </header>
+
+        <section class="technician-details-card">
+            <h2>Request Information</h2>
+
+            <div class="technician-details-grid">
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Request ID</span>
+                    <span class="technician-details-value">
+                        #{{ maintenance_request.id }}
+                    </span>
+                </div>
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Category</span>
+                    <span class="technician-details-value">
+                        {{ maintenance_request.get_category_display }}
+                    </span>
+                </div>
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Priority</span>
+                    <span class="technician-details-value">
+                        {{ maintenance_request.get_priority_display }}
+                    </span>
+                </div>
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Status</span>
+                    <span class="status-badge status-{{ maintenance_request.status }}">
+                        {{ maintenance_request.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Date Submitted</span>
+                    <span class="technician-details-value">
+                        {{ maintenance_request.date_submitted|date:"M d, Y - h:i A" }}
+                    </span>
+                </div>
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Date Assigned</span>
+                    <span class="technician-details-value">
+                        {% if maintenance_request.date_assigned %}
+                            {{ maintenance_request.date_assigned|date:"M d, Y - h:i A" }}
+                        {% else %}
+                            Not recorded
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Tenant</span>
+                    <span class="technician-details-value">
+                        {{ maintenance_request.tenant.get_full_name|default:maintenance_request.tenant.username }}
+                    </span>
+                </div>
+
+                <div class="technician-details-item">
+                    <span class="technician-details-label">Apartment Number</span>
+                    <span class="technician-details-value">
+                        {{ maintenance_request.tenant.userprofile.apartment_number|default:"Not provided" }}
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="technician-details-card">
+            <h2>Problem Description</h2>
+
+            <p class="technician-details-description">{{ maintenance_request.description }}</p>
+
+            <h3>Supporting Image</h3>
+
+            {% if maintenance_request.image %}
+                <a href="{{ maintenance_request.image.url }}"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <img
+                        src="{{ maintenance_request.image.url }}"
+                        alt="Supporting image for {{ maintenance_request.problem_title }}"
+                        class="technician-details-image">
+                </a>
+
+                <p class="dashboard-description">
+                    Click the image to open it in full size.
+                </p>
+            {% else %}
+                <p class="dashboard-description">
+                    No supporting image was provided.
+                </p>
+            {% endif %}
+        </section>
+
+        <section class="technician-details-card">
+            <h2>Update Maintenance Progress</h2>
+
+            {% if maintenance_request.status == 'assigned' %}
+                <p class="dashboard-description">
+                    Start working on this maintenance request when you are ready.
+                </p>
+
+                <form method="POST"
+                    action="{% url 'technician_update_request' maintenance_request.id %}">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="status" value="in_progress">
+
+                    <div style="margin-top: 20px;">
+                        <label for="repair_notes"
+                            style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            Repair Notes
+                        </label>
+
+                        <textarea
+                            id="repair_notes"
+                            name="repair_notes"
+                            rows="5"
+                            placeholder="Describe the work started, observations, or initial findings..."
+                            style="width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #d6c5ba; border-radius: 8px; font: inherit;"
+                        >{{ maintenance_request.repair_notes }}</textarea>
+                    </div>
+
+                    <button type="submit"
+                            style="margin-top: 18px; padding: 12px 20px; background: #B7410E; color: white; border: none; border-radius: 7px; cursor: pointer;">
+                        Start Maintenance
+                    </button>
+                </form>
+
+            {% elif maintenance_request.status == 'in_progress' %}
+                <p class="dashboard-description">
+                    Update your repair notes and mark the request as completed
+                    when the maintenance work is finished.
+                </p>
+
+                <form method="POST"
+                    action="{% url 'technician_update_request' maintenance_request.id %}">
+                    {% csrf_token %}
+
+                    <div style="margin-top: 20px;">
+                        <label for="repair_notes"
+                            style="display: block; margin-bottom: 8px; font-weight: 600;">
+                            Repair Notes <span style="color: #B7410E;">*</span>
+                        </label>
+
+                        <textarea
+                            id="repair_notes"
+                            name="repair_notes"
+                            rows="6"
+                            required
+                            placeholder="Describe the repair work performed..."
+                            style="width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #d6c5ba; border-radius: 8px; font: inherit;"
+                        >{{ maintenance_request.repair_notes }}</textarea>
+                    </div>
+
+                    <button type="submit"
+                            style="margin-top: 18px; padding: 12px 20px; background: #B7410E; color: white; border: none; border-radius: 7px; cursor: pointer;"
+                            name="status"
+                            value="completed">
+                        Mark as Completed
+                    </button>
+                </form>
+
+            {% elif maintenance_request.status == 'completed' %}
+                <p class="dashboard-description">
+                    This maintenance request has been completed.
+                </p>
+
+                {% if maintenance_request.date_completed %}
+                    <p>
+                        <strong>Completed on:</strong>
+                        {{ maintenance_request.date_completed|date:"M d, Y - h:i A" }}
+                    </p>
+                {% endif %}
+
+                {% if maintenance_request.repair_notes %}
+                    <p class="technician-details-description">{{ maintenance_request.repair_notes }}</p>
+                {% else %}
+                    <p>No repair notes were recorded.</p>
+                {% endif %}
+
+            {% else %}
+                <p class="dashboard-description">
+                    This request cannot currently be updated by the technician.
+                </p>
+            {% endif %}
+
+            <a href="{% url 'technician_requests' %}"
+            class="technician-details-back">
+                &larr; Back to Assigned Requests
+            </a>
+        </section>
+
+    </main>
+
+    <footer class="rust-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">RUST</div>
+                <p>Apartment Maintenance Portal</p>
+            </div>
+
+            <div class="footer-text">
+                <p>
+                    A centralized platform for managing apartment
+                    maintenance requests.
+                </p>
+
+                <p class="footer-copyright">
+                    &copy; 2026 Rust. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

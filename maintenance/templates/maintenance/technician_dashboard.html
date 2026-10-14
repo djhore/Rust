@@ -97,47 +97,29 @@
         </svg>
 
         <div>
-
-            <div class="rust-navbar-title">
-                Rust
-            </div>
-
+            <div class="rust-navbar-title">Rust</div>
             <div class="rust-navbar-subtitle">
                 Apartment Maintenance
             </div>
-
         </div>
 
     </div>
 
-
     <div class="rust-navbar-links">
 
-        <a
-            href="{% url 'dashboard' %}"
-            class="nav-link active"
-        >
+        <a href="{% url 'dashboard' %}" class="nav-link active">
             Dashboard
         </a>
 
-        <a
-            href="#"
-            class="nav-link"
-        >
+        <a href="{% url 'technician_requests' %}" class="nav-link">
             Assigned Requests
         </a>
 
-        <a
-            href="{% url 'profile' %}"
-            class="nav-link"
-        >
+        <a href="{% url 'profile' %}" class="nav-link">
             Profile
         </a>
 
-        <a
-            href="{% url 'logout' %}"
-            class="nav-link logout-link"
-        >
+        <a href="{% url 'logout' %}" class="nav-link logout-link">
             Logout
         </a>
 
@@ -146,107 +128,168 @@
 </nav>
 
 
+
 <main class="dashboard-container">
 
-    <div class="page-header">
+    <!-- Welcome section -->
+    <section class="dashboard-welcome">
 
-        <div>
+        <p class="dashboard-label">
+            RUST TECHNICIAN
+        </p>
 
-            <p class="section-label">
-                RUST TECHNICIAN
-            </p>
+        <h1>
+            Welcome, {{ profile.user.first_name }}!
+        </h1>
 
-            <h1>
-                Welcome, {{ profile.user.first_name }}
-            </h1>
-
-            <p>
-                Manage your assigned maintenance tasks and update their progress.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <section class="dashboard-grid">
-
-        <a href="#" class="quick-action">
-
-            <div class="quick-action-icon">
-                🔧
-            </div>
-
-            <h3>
-                Assigned Requests
-            </h3>
-
-            <p>
-                View maintenance requests assigned to you.
-            </p>
-
-        </a>
-
-
-        <a href="#" class="quick-action">
-
-            <div class="quick-action-icon">
-                📋
-            </div>
-
-            <h3>
-                Update Progress
-            </h3>
-
-            <p>
-                Update the status and progress of your assigned tasks.
-            </p>
-
-        </a>
-
-
-        <a
-            href="{% url 'profile' %}"
-            class="quick-action"
-        >
-
-            <div class="quick-action-icon">
-                👤
-            </div>
-
-            <h3>
-                My Profile
-            </h3>
-
-            <p>
-                View and update your account information.
-            </p>
-
-        </a>
+        <p class="dashboard-description">
+            Manage your assigned maintenance requests and update their progress
+            from one central location.
+        </p>
 
     </section>
 
 
-    <section class="info-card">
+    <!-- Technician profile -->
+    <section class="profile-card">
 
-        <h2>
-            Technician Account
-        </h2>
+        <div class="section-heading">
+            <div>
+                <p class="dashboard-label">ACCOUNT</p>
+                <h2>Technician Details</h2>
+            </div>
+        </div>
 
-        <p>
-            <strong>Username:</strong>
-            {{ profile.user.username }}
-        </p>
+        <div class="profile-details">
 
-        <p>
-            <strong>Role:</strong>
-            {{ profile.get_role_display }}
-        </p>
+            <div class="profile-item">
+                <span class="profile-label">Name</span>
+                <span class="profile-value">
+                    {{ profile.user.first_name }}
+                    {{ profile.user.last_name }}
+                </span>
+            </div>
 
-        <p>
-            <strong>Phone:</strong>
-            {{ profile.phone_number }}
-        </p>
+            <div class="profile-item">
+                <span class="profile-label">Username</span>
+                <span class="profile-value">
+                    {{ profile.user.username }}
+                </span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">Email</span>
+                <span class="profile-value">
+                    {{ profile.user.email|default:"Not provided" }}
+                </span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">Phone</span>
+                <span class="profile-value">
+                    {{ profile.phone_number|default:"Not provided" }}
+                </span>
+            </div>
+
+            <div class="profile-item">
+                <span class="profile-label">Role</span>
+                <span class="profile-role">
+                    {{ profile.get_role_display }}
+                </span>
+            </div>
+
+        </div>
+
+        <div style="margin-top: 24px;">
+            <a href="{% url 'profile' %}" class="btn btn-secondary">
+                View Profile
+            </a>
+        </div>
+
+    </section>
+
+
+    <!-- Technician quick actions -->
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+            <div>
+                <p class="dashboard-label">WORKSPACE</p>
+                <h2>Quick Actions</h2>
+            </div>
+        </div>
+
+        <div class="action-grid">
+
+            <a href="{% url 'technician_requests' %}"
+               class="action-card">
+
+                <div class="action-icon">🔧</div>
+
+                <div>
+                    <h3>Assigned Requests</h3>
+                    <p>
+                        View maintenance requests assigned to you.
+                    </p>
+                </div>
+
+                <span class="action-arrow">→</span>
+
+            </a>
+
+
+            <a href="{% url 'technician_progress' %}"
+               class="action-card">
+
+                <div class="action-icon">📋</div>
+
+                <div>
+                    <h3>Update Progress</h3>
+                    <p>
+                        Open your assigned requests to review their status
+                        and update their progress.
+                    </p>
+                </div>
+
+                <span class="action-arrow">→</span>
+
+            </a>
+
+
+            <a href="{% url 'profile' %}"
+               class="action-card">
+
+                <div class="action-icon">👤</div>
+
+                <div>
+                    <h3>My Profile</h3>
+                    <p>
+                        View and update your account information.
+                    </p>
+                </div>
+
+                <span class="action-arrow">→</span>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- Information banner -->
+    <section class="dashboard-info">
+
+        <div>
+            <p class="dashboard-label">RUST TECHNICIAN</p>
+
+            <h2>Maintenance Workspace</h2>
+
+            <p>
+                Handle assigned repairs, record maintenance activities,
+                and keep request information up to date.
+            </p>
+        </div>
 
     </section>
 
@@ -268,7 +311,6 @@
             </p>
 
         </div>
-
 
         <div class="footer-text">
 

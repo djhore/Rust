@@ -234,6 +234,14 @@
                     Reports
                 </a>
 
+                {% elif profile.role == 'technician' %}
+                 <a
+                href="{% url 'technician_requests' %} "
+                    class="nav-link"
+                >
+                    Assigned Requests
+                </a>
+
             {% endif %}
 
             <a

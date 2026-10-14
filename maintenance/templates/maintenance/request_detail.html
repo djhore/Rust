@@ -189,19 +189,20 @@
 
           {% endif %}
 
-          <div class="details-info-item">
-            <span class="details-label"> Assigned Technician </span>
+        <div class="details-info-item">
+
+            <span class="details-label">Assigned Technician</span>
 
             <span class="details-value">
-              {% if maintenance_request.assigned_technician %} {{
-              maintenance_request.assigned_technician.get_full_name|default:maintenance_request.assigned_technician.username
-              }} {% else %}
+                {% if maintenance_request.assigned_technician %}
+                    {{ maintenance_request.assigned_technician.get_full_name|default:maintenance_request.assigned_technician.username }}
+                {% else %}
 
-              <span class="details-muted"> Not yet assigned </span>
-
-              {% endif %}
+                     <span class="details-muted"> Not yet assigned </span>
+                     
+                {% endif %}
             </span>
-          </div>
+        </div>
 
           {% if maintenance_request.date_completed %}
 

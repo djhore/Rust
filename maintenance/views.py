@@ -11,7 +11,11 @@ from .forms import (
     ChangePriorityForm,
 )
 from .models import UserProfile, MaintenanceRequest, RoleVerificationCode
-from .decorators import manager_required,tenant_required
+from .decorators import (
+    manager_required,
+    tenant_required,
+    technician_required,
+)
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -503,6 +507,118 @@ def manager_reports(request):
         'maintenance/manager_reports.html',
         context
     )
+
+
+@technician_required
+def technician_requests(request):
+    requests = (
+        MaintenanceRequest.objects
+        .filter(assigned_technician=request.user)
+        .select_related('tenant', 'assigned_technician')
+        .order_by('-date_submitted')
+    )
+
+    return render(
+        request,
+        'maintenance/technician_requests.html',
+        {'requests': requests}
+    )
+
+@technician_required
+def technician_progress(request):
+    requests = (
+        MaintenanceRequest.objects
+        .filter(
+            assigned_technician=request.user,
+            status__in=['assigned', 'in_progress']
+        )
+        .select_related('tenant', 'assigned_technician')
+        .order_by('-date_submitted')
+    )
+
+    return render(
+        request,
+        'maintenance/technician_progress.html',
+        {'requests': requests}
+    )
+
+@technician_required
+def technician_request_detail(request, request_id):
+    maintenance_request = get_object_or_404(
+        MaintenanceRequest,
+        id=request_id,
+        assigned_technician=request.user
+    )
+
+    return render(
+        request,
+        'maintenance/technician_request_detail.html',
+        {'maintenance_request': maintenance_request}
+    )
+
+@technician_required
+def technician_update_request(request, request_id):
+    maintenance_request = get_object_or_404(
+        MaintenanceRequest,
+        id=request_id,
+        assigned_technician=request.user
+    )
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        repair_notes = request.POST.get('repair_notes', '').strip()
+
+        allowed_transitions = {
+            'assigned': ['in_progress'],
+            'in_progress': ['completed'],
+        }
+
+        current_status = maintenance_request.status
+        allowed_statuses = allowed_transitions.get(current_status, [])
+
+        if new_status not in allowed_statuses:
+            messages.error(
+                request,
+                'This status change is not allowed.'
+            )
+            return redirect(
+                'technician_request_detail',
+                request_id=maintenance_request.id
+            )
+
+        if new_status == 'completed' and not repair_notes:
+            messages.error(
+                request,
+                'Please enter repair notes before completing the request.'
+            )
+            return redirect(
+                'technician_request_detail',
+                request_id=maintenance_request.id
+            )
+
+        maintenance_request.status = new_status
+        maintenance_request.repair_notes = repair_notes
+
+        if new_status == 'completed':
+            maintenance_request.date_completed = timezone.now()
+
+        maintenance_request.save()
+
+        messages.success(
+            request,
+            'Maintenance request updated successfully.'
+        )
+
+        return redirect(
+            'technician_request_detail',
+            request_id=maintenance_request.id
+        )
+
+    return redirect(
+        'technician_request_detail',
+        request_id=maintenance_request.id
+    )
+
 @tenant_required
 def my_requests(request):
     requests = MaintenanceRequest.objects.filter(
