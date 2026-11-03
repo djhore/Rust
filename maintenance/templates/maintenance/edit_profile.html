@@ -1,32 +1,10 @@
-{% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% extends "maintenance/base.html" %}
 
-<head>
+{% block title %}Rust - Edit Profile{% endblock %}
 
-    <meta charset="UTF-8">
+{% block navigation %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Rust - Edit Profile</title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'maintenance/style.css' %}"
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
-        rel="stylesheet"
-    >
-
-</head>
-
-<body>
 
     <nav class="rust-navbar">
 
@@ -63,17 +41,21 @@
                 Profile
             </a>
 
-            <a
-                href="{% url 'logout' %}"
-                class="nav-link logout-link"
-            >
-                Logout
-            </a>
+           <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="nav-link logout-link">
+                    Logout
+                </button>
+            </form>
 
         </div>
 
     </nav>
 
+    
+{% endblock %}
+
+{% block content %}
 
     <main class="dashboard-container">
 
@@ -244,39 +226,5 @@
     </main>
 
 
-    <footer class="rust-footer">
+{% endblock %}
 
-        <div class="footer-content">
-
-            <div class="footer-brand">
-
-                <div class="footer-logo">
-                    RUST
-                </div>
-
-                <p>
-                    Apartment Maintenance Portal
-                </p>
-
-            </div>
-
-            <div class="footer-text">
-
-                <p>
-                    A centralized platform for managing apartment
-                    maintenance requests.
-                </p>
-
-                <p class="footer-copyright">
-                    &copy; 2026 Rust. All rights reserved.
-                </p>
-
-            </div>
-
-        </div>
-
-    </footer>
-
-</body>
-
-</html>

@@ -1,40 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
+{% extends "maintenance/base.html" %}
+{% load static %}
+{% block title %}Rust - Maintenance Reports{% endblock %}
 
-    <meta charset="UTF-8">
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="{% static 'maintenance/reports.js' %}" defer></script>
+{% endblock %}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Rust - Maintenance Reports</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
-        rel="stylesheet"
-    >
-
-    {% load static %}
-
-    <link
-        rel="stylesheet"
-        href="{% static 'maintenance/style.css' %}"
-    >
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-</head>
+{% block content %}
 
 
 <body>
@@ -172,12 +146,12 @@
                 Profile
             </a>
 
-            <a
-                href="{% url 'logout' %}"
-                class="nav-link logout-link"
-            >
-                Logout
-            </a>
+           <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="nav-link logout-link">
+                    Logout
+                </button>
+            </form>
 
         </div>
 
@@ -284,6 +258,17 @@
                     </td>
                 </tr>
 
+                <tr>
+                    <td>
+                        <span class="status-badge status-cancelled">
+                            Cancelled
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>{{ cancelled_requests }}</strong>
+                    </td>
+                </tr>
 
                 <tr>
                     <td>
@@ -395,39 +380,7 @@
 
     <!-- Footer -->
 
-    <footer class="rust-footer">
-
-        <div class="footer-content">
-
-            <div class="footer-brand">
-
-                <div class="footer-logo">
-                    RUST
-                </div>
-
-                <p>
-                    Apartment Maintenance Portal
-                </p>
-
-            </div>
-
-            <div class="footer-text">
-
-                <p>
-                    A centralized platform for managing apartment maintenance requests.
-                </p>
-
-                <p class="footer-copyright">
-                    &copy; 2026 Rust. All rights reserved.
-                </p>
-
-            </div>
-
-        </div>
-
-    </footer>
-
-
+  
    <!-- Chart Data -->
 
 {{ status_data|json_script:"status-data" }}
@@ -435,130 +388,4 @@
 {{ category_data|json_script:"category-data" }}
 
 
-<script>
-
-    /* =========================
-       STATUS DATA
-       ========================= */
-
-    const statusData = JSON.parse(
-        document.getElementById('status-data').textContent
-    );
-
-    const statusLabels = statusData.map(
-        item => item.status
-    );
-
-    const statusValues = statusData.map(
-        item => item.total
-    );
-
-
-    /* =========================
-       CATEGORY DATA
-       ========================= */
-
-    const categoryData = JSON.parse(
-        document.getElementById('category-data').textContent
-    );
-
-    const categoryLabels = categoryData.map(
-        item => item.category
-    );
-
-    const categoryValues = categoryData.map(
-        item => item.total
-    );
-
-
-    /* =========================
-       STATUS CHART
-       ========================= */
-
-    new Chart(
-        document.getElementById('statusChart'),
-        {
-            type: 'bar',
-
-            data: {
-
-                labels: statusLabels,
-
-                datasets: [
-                    {
-                        label: 'Maintenance Requests',
-
-                        data: statusValues,
-
-                        borderWidth: 1
-                    }
-                ]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        ticks: {
-                            precision: 0
-                        }
-
-                    }
-
-                }
-
-            }
-
-        }
-    );
-
-
-    /* =========================
-       CATEGORY CHART
-       ========================= */
-
-    new Chart(
-        document.getElementById('categoryChart'),
-        {
-            type: 'doughnut',
-
-            data: {
-
-                labels: categoryLabels,
-
-                datasets: [
-                    {
-                        label: 'Requests',
-
-                        data: categoryValues,
-
-                        borderWidth: 1
-                    }
-                ]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false
-
-            }
-
-        }
-    );
-
-</script>
-</body>
-
-</html>
+{% endblock %}

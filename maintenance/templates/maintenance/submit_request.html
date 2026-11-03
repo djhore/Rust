@@ -1,27 +1,10 @@
-{% load static %}
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{% extends "maintenance/base.html" %}
 
-    <title>Rust - Submit Maintenance Request</title>
+{% block title %}Rust - Submit Maintenance Request{% endblock %}
 
-    <!-- Rust fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+{% block navigation %}
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Rust stylesheet -->
-    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}" />
-  </head>
-
-  <body>
     <!-- Navigation -->
 
     <nav class="rust-navbar">
@@ -114,9 +97,18 @@
 
         <a href="{% url 'maintenance_history' %}" class="nav-link"> History </a>
 
-        <a href="{% url 'logout' %}" class="nav-link logout-link"> Logout </a>
+        <form method="POST" action="{% url 'logout' %}" class="logout-form">
+              {% csrf_token %}
+              <button type="submit" class="nav-link logout-link">
+                  Logout
+              </button>
+          </form>
       </div>
     </nav>
+    
+{% endblock %}
+
+{% block content %}
 
     <!-- Main content -->
 
@@ -176,24 +168,5 @@
       </section>
     </main>
 
-    <!-- Footer -->
-
-    <footer class="rust-footer">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <div class="footer-logo">RUST</div>
-
-          <p>Apartment Maintenance Portal</p>
-        </div>
-
-        <div class="footer-text">
-          <p>
-            A centralized platform for managing apartment maintenance requests.
-          </p>
-
-          <p class="footer-copyright">&copy; 2026 Rust. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
-  </body>
-</html>
+   
+{% endblock %}

@@ -1,26 +1,8 @@
-{% load static %}
+{% extends "maintenance/base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}Rust - Manager Dashboard{% endblock %}
 
-    <title>Rust - Manager Dashboard</title>
-
-    <!-- Rust fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
-          rel="stylesheet">
-
-    <!-- Rust stylesheet -->
-    <link rel="stylesheet"
-          href="{% static 'maintenance/style.css' %}">
-</head>
-
-<body>
+{% block navigation %}
 
     <!-- Navigation -->
 
@@ -149,16 +131,20 @@
                 Profile
             </a>
 
-            <a href="{% url 'logout' %}"
-               class="nav-link logout-link">
-                Logout
-            </a>
+           <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="nav-link logout-link">
+                    Logout
+                </button>
+            </form>
 
         </div>
 
     </nav>
 
+{% endblock %}
 
+{% block content %}
     <!-- Dashboard -->
 
     <main class="dashboard-container">
@@ -434,42 +420,4 @@
 
     </main>
 
-
-    <!-- Footer -->
-
-    <footer class="rust-footer">
-
-        <div class="footer-content">
-
-            <div class="footer-brand">
-
-                <div class="footer-logo">
-                    RUST
-                </div>
-
-                <p>
-                    Apartment Maintenance Portal
-                </p>
-
-            </div>
-
-
-            <div class="footer-text">
-
-                <p>
-                    A centralized platform for managing
-                    apartment maintenance requests.
-                </p>
-
-                <p class="footer-copyright">
-                    &copy; 2026 Rust. All rights reserved.
-                </p>
-
-            </div>
-
-        </div>
-
-    </footer>
-
-</body>
-</html>
+{% endblock %}

@@ -9,6 +9,7 @@ body {
     background-color: #f7f3f0;
     color: #292524;
 }
+
 /* ---------- Navigation ---------- */
 
 .navbar {
@@ -226,35 +227,28 @@ th {
     position: relative;
 
     background:
-        radial-gradient(
-            ellipse at 15% 20%,
+        radial-gradient(ellipse at 15% 20%,
             rgba(240, 160, 106, 0.20),
-            transparent 18%
-        ),
+            transparent 18%),
 
-        radial-gradient(
-            ellipse at 85% 70%,
+        radial-gradient(ellipse at 85% 70%,
             rgba(90, 30, 8, 0.25),
-            transparent 22%
-        ),
+            transparent 22%),
 
-        radial-gradient(
-            ellipse at 60% 10%,
+        radial-gradient(ellipse at 60% 10%,
             rgba(255, 190, 130, 0.12),
-            transparent 15%
-        ),
+            transparent 15%),
 
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             #8f2d0a,
             #b7410e 50%,
-            #96350b
-        );
+            #96350b);
 
     color: white;
     padding: 30px 25px;
     overflow: hidden;
 }
+
 .login-header h1 {
     color: white;
     margin: 0;
@@ -295,7 +289,7 @@ th {
 }
 
 .register-link a {
-    color:  #b7410e;
+    color: #b7410e;
     text-decoration: none;
     font-weight: 600;
 }
@@ -331,6 +325,7 @@ th {
     font-weight: 700;
     letter-spacing: 0.5px;
 }
+
 .rust-brand-text p {
     color: #f8e8df;
     margin: 5px 0 0;
@@ -616,8 +611,8 @@ th {
     box-shadow: 0 4px 15px rgba(70, 40, 25, 0.06);
 
     transition: transform 0.2s ease,
-                box-shadow 0.2s ease,
-                border-color 0.2s ease;
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
 
@@ -697,11 +692,9 @@ th {
     padding: 25px 30px;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             #8f2d0a,
-            #b7410e
-        );
+            #b7410e);
 
     border-radius: 14px;
 
@@ -1114,6 +1107,10 @@ th {
     color: #28633c;
 }
 
+.status-cancelled {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
 
 /* Request information */
 
@@ -2354,27 +2351,19 @@ th {
     position: relative;
 
     background:
-        radial-gradient(
-            ellipse at 15% 20%,
+        radial-gradient(ellipse at 15% 20%,
             rgba(240, 160, 106, 0.20),
-            transparent 18%
-        ),
-        radial-gradient(
-            ellipse at 85% 70%,
+            transparent 18%),
+        radial-gradient(ellipse at 85% 70%,
             rgba(90, 30, 8, 0.25),
-            transparent 22%
-        ),
-        radial-gradient(
-            ellipse at 60% 10%,
+            transparent 22%),
+        radial-gradient(ellipse at 60% 10%,
             rgba(255, 190, 130, 0.12),
-            transparent 15%
-        ),
-        linear-gradient(
-            135deg,
+            transparent 15%),
+        linear-gradient(135deg,
             #8f2d0a,
             #b7410e 50%,
-            #96350b
-        );
+            #96350b);
 
     color: white;
 
@@ -2715,13 +2704,14 @@ th {
     }
 
 }
+
 /* =========================
    REPORT STATISTICS
    ========================= */
 
 .report-statistics {
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
     gap: 18px;
     width: 100%;
     margin-top: 30px;
@@ -2802,7 +2792,7 @@ th {
 
 /* Space between summary table and first chart */
 
-.requests-section + .report-card {
+.requests-section+.report-card {
     margin-top: 40px;
 }
 
@@ -2810,7 +2800,8 @@ th {
    TECHNICIAN DASHBOARD
    ========================= */
 
-.profile-card {
+
+.technician-dashboard .profile-card {
     background-color: #ffffff;
     border: 1px solid #eadbd3;
     border-radius: 16px;
@@ -2868,7 +2859,7 @@ th {
     margin-bottom: 50px;
 }
 
-.dashboard-quick-actions > h2 {
+.dashboard-quick-actions>h2 {
     font-family: 'Roboto Slab', serif;
     font-size: 30px;
     color: #292524;
@@ -2907,7 +2898,7 @@ th {
 }
 
 @media (max-width: 600px) {
-    .profile-card {
+    .technician-dashboard .profile-card {
         padding: 24px 20px;
     }
 
@@ -2981,114 +2972,51 @@ th {
     }
 }
 
-/* Technician Update Progress page */
+/* =========================================
+   DJANGO MESSAGES
+   ========================================= */
 
-.technician-progress-page {
-    width: calc(100% - 48px);
-    max-width: 1270px;
-    margin: 42px auto;
-    min-height: 400px;
+.messages-container {
+    width: min(1100px, calc(100% - 40px));
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.technician-progress-page .dashboard-welcome {
-    margin-bottom: 34px;
+.message {
+    padding: 14px 18px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
-.technician-progress-page .dashboard-welcome h1 {
-    margin-top: 8px;
-    margin-bottom: 12px;
+/* Successful actions */
+.message-success {
+    background-color: #ecfdf3;
+    border-color: #a7f3d0;
+    color: #166534;
 }
 
-.technician-progress-page .dashboard-section {
-    margin-bottom: 30px;
+/* Errors and failed actions */
+.message-error {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
 }
 
-.technician-progress-page .section-heading {
-    margin-bottom: 20px;
+/* Warnings */
+.message-warning {
+    background-color: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
 }
 
-.technician-progress-page .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    background: #ffffff;
-    border: 1px solid #eadfd8;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(41, 37, 36, 0.05);
-}
-
-.technician-progress-page .requests-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #ffffff;
-}
-
-.technician-progress-page .requests-table th {
-    padding: 17px 20px;
-    background: #f7f3f0;
-    color: #57504c;
-    text-align: left;
-    font-size: 0.88rem;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.technician-progress-page .requests-table td {
-    padding: 20px;
-    border-top: 1px solid #eee4de;
-    vertical-align: middle;
-    line-height: 1.6;
-}
-
-.technician-progress-page .requests-table td strong {
-    color: #292524;
-}
-
-.technician-progress-page .requests-table td small {
-    color: #78716c;
-}
-
-.technician-progress-page .requests-table tbody tr:hover {
-    background: #fdfaf8;
-}
-
-.technician-progress-page .requests-table .btn {
-    display: inline-block;
-    padding: 10px 15px;
-    border-radius: 7px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.technician-progress-page .dashboard-info {
-    margin-top: 32px;
-}
-
-.technician-progress-page .dashboard-info h2 {
-    color: #ffffff;
-}
-
-.technician-progress-page .dashboard-info p {
-    line-height: 1.7;
-}
-
-.technician-progress-page .profile-card {
-    padding: 30px;
-}
-
-@media (max-width: 768px) {
-    .technician-progress-page {
-        width: calc(100% - 32px);
-        margin: 28px auto;
-    }
-
-    .technician-progress-page .requests-table th,
-    .technician-progress-page .requests-table td {
-        padding: 13px;
-    }
-
-    .technician-progress-page .dashboard-info {
-        padding: 24px;
-    }
+/* Informational messages */
+.message-info {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e40af;
 }

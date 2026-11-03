@@ -1,11 +1,11 @@
+
+{% extends "maintenance/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rust | Update Progress</title>
-    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}">
+
+{% block title %}Rust | Request Details{% endblock %}
+
+{% block extra_css %}
+
 
     <style>
         .progress-page {
@@ -288,9 +288,12 @@
             }
         }
     </style>
-</head>
+    
+{% endblock %}
 
-<body>
+{% block navigation %}
+
+
 <nav class="rust-navbar">
 
     <div class="rust-navbar-brand">
@@ -389,13 +392,20 @@
             Profile
         </a>
 
-        <a href="{% url 'logout' %}" class="nav-link logout-link">
-            Logout
-        </a>
+       <form method="POST" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-link logout-link">
+                Logout
+            </button>
+        </form>
 
     </div>
 
 </nav>
+
+{% endblock %}
+
+{% block content %}
 
     <main class="progress-page">
 
@@ -516,24 +526,5 @@
 
     </main>
 
-    <footer class="rust-footer">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <div class="footer-logo">RUST</div>
-                <p>Apartment Maintenance Portal</p>
-            </div>
-
-            <div class="footer-text">
-                <p>
-                    A centralized platform for managing apartment
-                    maintenance requests.
-                </p>
-                <p class="footer-copyright">
-                    &copy; 2026 Rust. All rights reserved.
-                </p>
-            </div>
-        </div>
-    </footer>
-
-</body>
-</html>
+  
+{% endblock %}

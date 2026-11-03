@@ -3,6 +3,11 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.views.decorators.http import require_POST
+from django.db import transaction
+import mimetypes
+from django.http import FileResponse, Http404
 from .forms import (
     TenantRegistrationForm,
     MaintenanceRequestForm,
@@ -20,115 +25,166 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models import Count
+from django.core.cache import cache
+from django.utils.http import url_has_allowed_host_and_scheme
+
 
 def register(request):
-
-    if request.method == 'POST':
-
+    if request.method == "POST":
         form = TenantRegistrationForm(request.POST)
 
         if form.is_valid():
+            try:
+                with transaction.atomic():
+                    # Lock the code row so simultaneous registrations
+                    # cannot successfully claim the same code.
+                    verification_code = (
+                        RoleVerificationCode.objects
+                        .select_for_update()
+                        .get(code=form.cleaned_data["role_code"])
+                    )
 
-            user = form.save()
+                    if verification_code.is_used:
+                        form.add_error(
+                            "role_code",
+                            "This verification code is invalid or no longer available.",
+                        )
+                        raise ValueError("Verification code unavailable.")
 
-            verification_code = RoleVerificationCode.objects.get(
-                code=form.cleaned_data['role_code']
-            )
+                    # Create the user and profile in the same transaction.
+                    user = form.save(commit=False)
+                    user.save()
 
-            UserProfile.objects.create(
-                user=user,
-                role=verification_code.role,
-                phone_number=form.cleaned_data['phone_number'],
-                apartment_number=form.cleaned_data['apartment_number'],
-            )
+                    profile = UserProfile(
+                        user=user,
+                        role=verification_code.role,
+                        phone_number=form.cleaned_data["phone_number"],
+                        apartment_number=form.cleaned_data["apartment_number"],
+                    )
 
-            verification_code.is_used = True
-            verification_code.used_by = user
-            verification_code.save()
+                    profile.full_clean()
+                    profile.save()
 
-            login(request, user)
+                    verification_code.is_used = True
+                    verification_code.used_by = user
+                    verification_code.save(
+                        update_fields=["is_used", "used_by"]
+                    )
 
-            messages.success(
-                request,
-                'Your Rust account has been created successfully.'
-            )
+            except RoleVerificationCode.DoesNotExist:
+                form.add_error(
+                    "role_code",
+                    "This verification code is invalid or no longer available.",
+                )
 
-            return redirect('dashboard')
+            except ValueError:
+                # The form now contains the code error.
+                pass
+
+            else:
+                login(request, user)
+
+                messages.success(
+                    request,
+                    "Your Rust account has been created successfully.",
+                )
+
+                return redirect("dashboard")
 
     else:
-
         form = TenantRegistrationForm()
 
     return render(
         request,
-        'maintenance/register.html',
-        {'form': form}
+        "maintenance/register.html",
+        {"form": form},
     )
 
 def user_login(request):
+    if request.method != "POST":
+        return render(request, "maintenance/login.html")
 
-    if request.method == 'POST':
+    username = request.POST.get("username", "").strip()
+    password = request.POST.get("password", "")
+    role_code = request.POST.get("role_code", "").strip()
 
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        role_code = request.POST.get('role_code')
+    # Use the username and client IP to limit repeated attempts.
+    # Do not trust forwarded IP headers unless your proxy is configured.
+    client_ip = request.META.get("REMOTE_ADDR", "unknown")
+    attempt_key = f"rust-login:{client_ip}:{username.lower()}"
+    attempts = cache.get(attempt_key, 0)
 
-        user = authenticate(
+    if attempts >= 5:
+        messages.error(
             request,
-            username=username,
-            password=password
+            "Too many failed login attempts. Please wait five minutes "
+            "before trying again.",
         )
+        return render(request, "maintenance/login.html")
 
-        if user is not None:
+    user = authenticate(
+        request,
+        username=username,
+        password=password,
+    )
 
-            try:
-                profile = UserProfile.objects.get(user=user)
-            except UserProfile.DoesNotExist:
-                messages.error(
-                    request,
-                    'Your account does not have a Rust role assigned.'
-                )
-                return render(
-                    request,
-                    'maintenance/login.html'
-                )
-
-            try:
-                verification_code = RoleVerificationCode.objects.get(
-                    code=role_code
-                )
-            except RoleVerificationCode.DoesNotExist:
-                messages.error(
-                    request,
-                    'Invalid role verification code.'
-                )
-                return render(
-                    request,
-                    'maintenance/login.html'
-                )
-
-            if verification_code.role != profile.role:
-                messages.error(
-                    request,
-                    'The verification code does not match your account role.'
-                )
-                return render(
-                    request,
-                    'maintenance/login.html'
-                )
-
-            login(request, user)
-            return redirect('dashboard')
+    if user is None:
+        attempts += 1
+        cache.set(attempt_key, attempts, timeout=300)
 
         messages.error(
             request,
-            'Invalid username or password.'
+            "Invalid login details or role verification code.",
+        )
+        return render(request, "maintenance/login.html")
+
+    try:
+        profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        cache.delete(attempt_key)
+        messages.error(
+            request,
+            "This account is not configured for Rust access.",
+        )
+        return render(request, "maintenance/login.html")
+
+    
+
+    verification_code = RoleVerificationCode.objects.filter(
+        code=role_code,
+        is_used=True,
+        used_by=user,
+        role=profile.role,
+    ).first()
+
+    if verification_code is None:
+        messages.error(
+            request,
+             "Invalid login details or role verification code.",
+        )
+        return render(
+            request,
+            "maintenance/login.html",
         )
 
-    return render(
-        request,
-        'maintenance/login.html'
-    )
+
+    # Clear the failure counter after successful authentication.
+    cache.delete(attempt_key)
+
+    login(request, user)
+
+    # Honour ?next= only when it points to a safe local destination.
+    next_url = request.POST.get("next") or request.GET.get("next")
+
+    if next_url and url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(next_url)
+
+    return redirect("dashboard")
+
 
 @login_required
 def profile(request):
@@ -191,90 +247,79 @@ def edit_profile(request):
             'profile': user_profile,
         }
     )
+
 @login_required
 def change_password(request):
-
-    if request.method == 'POST':
-
-        current_password = request.POST.get('current_password')
-        new_password = request.POST.get('new_password')
-        confirm_password = request.POST.get('confirm_password')
-
-        if not request.user.check_password(current_password):
-
-            messages.error(
-                request,
-                'Your current password is incorrect.'
-            )
-
-            return redirect('change_password')
-
-        if new_password != confirm_password:
-
-            messages.error(
-                request,
-                'The new passwords do not match.'
-            )
-
-            return redirect('change_password')
-
-        if len(new_password) < 8:
-
-            messages.error(
-                request,
-                'Your new password must be at least 8 characters long.'
-            )
-
-            return redirect('change_password')
-
-        request.user.set_password(new_password)
-        request.user.save()
-
-        update_session_auth_hash(request, request.user)
-
-        messages.success(
-            request,
-            'Your password has been changed successfully.'
+    if request.method == "POST":
+        form = PasswordChangeForm(
+            user=request.user,
+            data=request.POST,
         )
 
-        return redirect('profile')
+        for field in form.fields.values():
+            field.widget.attrs["class"] = "form-control"
+
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+
+            messages.success(
+                request,
+                "Your password has been changed successfully.",
+            )
+
+            return redirect("profile")
+
+    else:
+        form = PasswordChangeForm(user=request.user)
 
     return render(
         request,
-        'maintenance/change_password.html'
+        "maintenance/change_password.html",
+        {"form": form},
     )
+
 
 
 @login_required
 def dashboard(request):
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        messages.error(
+            request,
+            "This account is not configured for Rust access. Please contact the administrator.",
+        )
+        auth_logout(request)
+        return redirect("login")
 
-    profile = UserProfile.objects.get(user=request.user)
-
-    if profile.role == 'tenant':
-
+    if profile.role == "tenant":
         return render(
             request,
-            'maintenance/dashboard.html',
-            {'profile': profile}
+            "maintenance/dashboard.html",
+            {"profile": profile},
         )
 
-    elif profile.role == 'manager':
-
+    if profile.role == "manager":
         return render(
             request,
-            'maintenance/manager_dashboard.html',
-            {'profile': profile}
+            "maintenance/manager_dashboard.html",
+            {"profile": profile},
         )
 
-    elif profile.role == 'technician':
-
+    if profile.role == "technician":
         return render(
             request,
-            'maintenance/technician_dashboard.html',
-            {'profile': profile}
+            "maintenance/technician_dashboard.html",
+            {"profile": profile},
         )
 
-
+    messages.error(
+        request,
+        "This account has an invalid Rust role. Please contact the administrator.",
+    )
+    auth_logout(request)
+    return redirect("login")
 
 @manager_required
 def manager_requests(request):
@@ -303,100 +348,216 @@ def manager_request_detail(request, request_id):
         {'maintenance_request': maintenance_request}
     )
 
-@manager_required
-def assign_technician(request, request_id):
+@login_required
+def maintenance_request_image(request, request_id):
     maintenance_request = get_object_or_404(
         MaintenanceRequest,
-        id=request_id
+        id=request_id,
     )
 
-    if maintenance_request.status != 'pending':
-        messages.error(
-            request,
-            'Only pending maintenance requests can be assigned.'
-        )
-        return redirect(
-            'manager_request_detail',
-            request_id=request_id
-        )
+    try:
+        profile = request.user.userprofile
+    except UserProfile.DoesNotExist:
+        raise Http404
 
-    if request.method == 'POST':
-        form = AssignTechnicianForm(
-            request.POST,
-            instance=maintenance_request
-        )
+    if profile.role == "tenant":
+        if maintenance_request.tenant_id != request.user.id:
+            raise Http404
 
-        if form.is_valid():
-            maintenance_request = form.save(commit=False)
+    elif profile.role == "technician":
+        if maintenance_request.assigned_technician_id != request.user.id:
+            raise Http404
 
-            maintenance_request.status = 'assigned'
-            maintenance_request.date_assigned = timezone.now()
+    elif profile.role != "manager":
+        raise Http404
 
-            maintenance_request.save()
+    if not maintenance_request.image:
+        raise Http404
 
-            messages.success(
-                request,
-                'The maintenance request has been assigned successfully.'
+    content_type, _ = mimetypes.guess_type(
+        maintenance_request.image.name
+    )
+
+    return FileResponse(
+        maintenance_request.image.open("rb"),
+        content_type=content_type or "application/octet-stream",
+    )
+@manager_required
+def assign_technician(request, request_id):
+    if request.method == "POST":
+        with transaction.atomic():
+            maintenance_request = get_object_or_404(
+                MaintenanceRequest.objects.select_for_update(),
+                id=request_id,
             )
 
-            return redirect(
-                'manager_request_detail',
-                request_id=request_id
-            )
+            if maintenance_request.status != "pending":
+                messages.error(
+                    request,
+                    "Only pending maintenance requests can be assigned.",
+                )
+                return redirect(
+                    "manager_request_detail",
+                    request_id=request_id,
+                )
 
+            form = AssignTechnicianForm(request.POST)
+
+            if form.is_valid():
+                technician = form.cleaned_data["technician"]
+
+                # Check the technician's role again on the server.
+                if not UserProfile.objects.filter(
+                    user=technician,
+                    role="technician",
+                ).exists() or not technician.is_active:
+                    form.add_error(
+                        "technician",
+                        "Please select an active maintenance technician.",
+                    )
+                else:
+                    maintenance_request.assigned_technician = technician
+                    maintenance_request.status = "assigned"
+                    maintenance_request.date_assigned = timezone.now()
+                    maintenance_request.save(
+                        update_fields=[
+                            "assigned_technician",
+                            "status",
+                            "date_assigned",
+                            "updated_at",
+                        ]
+                    )
+
+                    messages.success(
+                        request,
+                        "The maintenance request has been assigned successfully.",
+                    )
+                    return redirect(
+                        "manager_request_detail",
+                        request_id=request_id,
+                    )
     else:
-        form = AssignTechnicianForm(
-            instance=maintenance_request
+        maintenance_request = get_object_or_404(
+            MaintenanceRequest,
+            id=request_id,
         )
+
+        if maintenance_request.status != "pending":
+            messages.error(
+                request,
+                "Only pending maintenance requests can be assigned.",
+            )
+            return redirect(
+                "manager_request_detail",
+                request_id=request_id,
+            )
+
+        form = AssignTechnicianForm()
 
     return render(
         request,
-        'maintenance/assign_technician.html',
+        "maintenance/assign_technician.html",
         {
-            'form': form,
-            'maintenance_request': maintenance_request,
-        }
+            "form": form,
+            "maintenance_request": maintenance_request,
+        },
     )
 
 @manager_required
 def change_priority(request, request_id):
-    maintenance_request = get_object_or_404(
-        MaintenanceRequest,
-        id=request_id
-    )
-
-    if request.method == 'POST':
-        form = ChangePriorityForm(
-            request.POST,
-            instance=maintenance_request
-        )
-
-        if form.is_valid():
-            form.save()
-
-            messages.success(
-                request,
-                'The maintenance request priority has been updated successfully.'
+    if request.method == "POST":
+        with transaction.atomic():
+            maintenance_request = get_object_or_404(
+                MaintenanceRequest.objects.select_for_update(),
+                id=request_id,
             )
 
-            return redirect(
-                'manager_request_detail',
-                request_id=request_id
+            # Do not allow priority changes for closed requests.
+            if maintenance_request.status in {"cancelled", "completed"}:
+                messages.error(
+                    request,
+                    "Priority cannot be changed for cancelled or completed requests.",
+                )
+                return redirect(
+                    "manager_request_detail",
+                    request_id=request_id,
+                )
+
+            form = ChangePriorityForm(
+                request.POST,
+                instance=maintenance_request,
             )
+
+            if form.is_valid():
+                form.save()
+
+                messages.success(
+                    request,
+                    "The maintenance request priority has been updated successfully.",
+                )
+
+                return redirect(
+                    "manager_request_detail",
+                    request_id=request_id,
+                )
 
     else:
+        maintenance_request = get_object_or_404(
+            MaintenanceRequest,
+            id=request_id,
+        )
+
+        if maintenance_request.status in {"cancelled", "completed"}:
+            messages.error(
+                request,
+                "Priority cannot be changed for cancelled or completed requests.",
+            )
+            return redirect(
+                "manager_request_detail",
+                request_id=request_id,
+            )
+
         form = ChangePriorityForm(
-            instance=maintenance_request
+            instance=maintenance_request,
         )
 
     return render(
         request,
-        'maintenance/change_priority.html',
+        "maintenance/change_priority.html",
         {
-            'form': form,
-            'maintenance_request': maintenance_request,
-        }
+            "form": form,
+            "maintenance_request": maintenance_request,
+        },
     )
+
+@manager_required
+@require_POST
+def cancel_maintenance_request(request, request_id):
+    with transaction.atomic():
+        maintenance_request = get_object_or_404(
+            MaintenanceRequest.objects.select_for_update(),
+            id=request_id,
+        )
+
+        if maintenance_request.status in ("completed", "cancelled"):
+            messages.error(
+                request,
+                "Completed or already cancelled requests cannot be cancelled.",
+            )
+        else:
+            maintenance_request.status = "cancelled"
+            maintenance_request.save(update_fields=["status", "updated_at"])
+
+            messages.success(
+                request,
+                "The maintenance request has been cancelled successfully.",
+            )
+
+    return redirect(
+        "manager_request_detail",
+        request_id=request_id,
+    )
+
 
 @manager_required
 def manager_technicians(request):
@@ -413,12 +574,17 @@ def manager_technicians(request):
 
 @manager_required
 def manager_users(request):
-    users = UserProfile.objects.select_related('user').all().order_by('role')
+    users = (
+        UserProfile.objects
+        .select_related("user")
+        .all()
+        .order_by("role", "user__username")
+    )
 
     return render(
         request,
-        'maintenance/manager_users.html',
-        {'users': users}
+        "maintenance/manager_users.html",
+        {"users": users},
     )
 
 @manager_required
@@ -439,6 +605,10 @@ def manager_reports(request):
 
     completed_requests = MaintenanceRequest.objects.filter(
         status='completed'
+    ).count()
+
+    cancelled_requests = MaintenanceRequest.objects.filter(
+    status='cancelled'
     ).count()
 
     category_data = (
@@ -472,6 +642,10 @@ def manager_reports(request):
             'status': 'Completed',
             'total': completed_requests
         },
+        {
+            'status': 'Cancelled',
+            'total': cancelled_requests
+        },
     ]
 
     context = {
@@ -480,6 +654,7 @@ def manager_reports(request):
     'assigned_requests': assigned_requests,
     'in_progress_requests': in_progress_requests,
     'completed_requests': completed_requests,
+    'cancelled_requests': cancelled_requests,
     'category_data': list(category_data),
     'priority_data': list(priority_data),
 
@@ -500,6 +675,10 @@ def manager_reports(request):
             'status': 'Completed',
             'total': completed_requests
         },
+        {
+            'status': 'Cancelled',
+            'total': cancelled_requests
+        },
     ],
     }
     return render(
@@ -513,7 +692,10 @@ def manager_reports(request):
 def technician_requests(request):
     requests = (
         MaintenanceRequest.objects
-        .filter(assigned_technician=request.user)
+        .filter(
+            assigned_technician=request.user,
+            status__in=["assigned", "in_progress", "completed"],
+        )
         .select_related('tenant', 'assigned_technician')
         .order_by('-date_submitted')
     )
@@ -556,68 +738,120 @@ def technician_request_detail(request, request_id):
         {'maintenance_request': maintenance_request}
     )
 
+
+
 @technician_required
 def technician_update_request(request, request_id):
-    maintenance_request = get_object_or_404(
-        MaintenanceRequest,
-        id=request_id,
-        assigned_technician=request.user
-    )
+    if request.method != "POST":
+        return redirect(
+            "technician_request_detail",
+            request_id=request_id,
+        )
 
-    if request.method == 'POST':
-        new_status = request.POST.get('status')
-        repair_notes = request.POST.get('repair_notes', '').strip()
-
-        allowed_transitions = {
-            'assigned': ['in_progress'],
-            'in_progress': ['completed'],
-        }
+    with transaction.atomic():
+        maintenance_request = get_object_or_404(
+            MaintenanceRequest.objects.select_for_update(),
+            id=request_id,
+            assigned_technician=request.user,
+        )
 
         current_status = maintenance_request.status
-        allowed_statuses = allowed_transitions.get(current_status, [])
+
+        # Prevent updates to cancelled or completed requests.
+        if current_status in {"cancelled", "completed"}:
+            messages.error(
+                request,
+                "Cancelled or completed requests cannot be updated.",
+            )
+            return redirect(
+                "technician_request_detail",
+                request_id=request_id,
+            )
+
+        new_status = request.POST.get("status", "").strip()
+        repair_notes = request.POST.get("repair_notes", "").strip()
+
+        allowed_transitions = {
+            "assigned": {"in_progress"},
+            "in_progress": {"completed"},
+        }
+
+        # Allow saving a progress note without changing the status.
+        if not new_status:
+            if not repair_notes:
+                messages.error(
+                    request,
+                    "Enter a progress note before saving.",
+                )
+                return redirect(
+                    "technician_request_detail",
+                    request_id=request_id,
+                )
+
+            if current_status not in {"assigned", "in_progress"}:
+                messages.error(
+                    request,
+                    "Progress notes can only be added to active requests.",
+                )
+                return redirect(
+                    "technician_request_detail",
+                    request_id=request_id,
+                )
+
+            maintenance_request.repair_notes = repair_notes
+            maintenance_request.save(
+                update_fields=["repair_notes", "updated_at"]
+            )
+
+            messages.success(
+                request,
+                "Progress note saved successfully.",
+            )
+            return redirect(
+                "technician_request_detail",
+                request_id=request_id,
+            )
+
+        # Reject unsupported status transitions.
+        allowed_statuses = allowed_transitions.get(current_status, set())
 
         if new_status not in allowed_statuses:
             messages.error(
                 request,
-                'This status change is not allowed.'
+                "This status change is not allowed.",
             )
             return redirect(
-                'technician_request_detail',
-                request_id=maintenance_request.id
+                "technician_request_detail",
+                request_id=request_id,
             )
 
-        if new_status == 'completed' and not repair_notes:
-            messages.error(
-                request,
-                'Please enter repair notes before completing the request.'
-            )
-            return redirect(
-                'technician_request_detail',
-                request_id=maintenance_request.id
-            )
+        if new_status == "completed":
+            if not repair_notes:
+                messages.error(
+                    request,
+                    "Please enter repair notes before completing the request.",
+                )
+                return redirect(
+                    "technician_request_detail",
+                    request_id=request_id,
+                )
+
+            maintenance_request.date_completed = timezone.now()
 
         maintenance_request.status = new_status
         maintenance_request.repair_notes = repair_notes
-
-        if new_status == 'completed':
-            maintenance_request.date_completed = timezone.now()
-
         maintenance_request.save()
 
-        messages.success(
-            request,
-            'Maintenance request updated successfully.'
-        )
-
-        return redirect(
-            'technician_request_detail',
-            request_id=maintenance_request.id
-        )
+    messages.success(
+        request,
+        "Maintenance request updated successfully.",
+    )
 
     return redirect(
-        'technician_request_detail',
-        request_id=maintenance_request.id
+        "technician_request_detail",
+        request_id=request_id,
     )
+
 
 @tenant_required
 def my_requests(request):
@@ -667,6 +901,9 @@ def submit_request(request):
             maintenance_request = form.save(commit=False)
 
             maintenance_request.tenant = request.user
+            maintenance_request.apartment_number = (
+                UserProfile.objects.get(user=request.user).apartment_number
+            )
             maintenance_request.status = 'pending'
 
             maintenance_request.save()
@@ -687,6 +924,8 @@ def submit_request(request):
         {'form': form}
     )
 
+@login_required
+@require_POST
 def user_logout(request):
     auth_logout(request)
-    return redirect('login')
+    return redirect("login")

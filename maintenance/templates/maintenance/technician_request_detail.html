@@ -1,14 +1,11 @@
 
+{% extends "maintenance/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Rust | Request Details</title>
+{% block title %}Rust | Request Details{% endblock %}
 
-    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}">
+{% block extra_css %}
+
 
     <style>
         .technician-details-page {
@@ -96,9 +93,12 @@
             }
         }
     </style>
-</head>
+    
+{% endblock %}
 
-<body>
+{% block navigation %}
+
+
         <nav class="rust-navbar">
 
         <div class="rust-navbar-brand">
@@ -197,13 +197,19 @@
                 Profile
             </a>
 
-            <a href="{% url 'logout' %}" class="nav-link logout-link">
-                Logout
-            </a>
-
+          <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="nav-link logout-link">
+                    Logout
+                </button>
+            </form>
         </div>
 
     </nav>
+
+{% endblock %}
+
+{% block content %}
 
 
     <main class="technician-details-page">
@@ -301,15 +307,17 @@
 
             <h3>Supporting Image</h3>
 
+           
             {% if maintenance_request.image %}
-                <a href="{{ maintenance_request.image.url }}"
-                   target="_blank"
-                   rel="noopener noreferrer">
+                <a href="{% url 'maintenance_request_image' maintenance_request.id %}"
+                target="_blank"
+                rel="noopener noreferrer">
                     <img
-                        src="{{ maintenance_request.image.url }}"
+                        src="{% url 'maintenance_request_image' maintenance_request.id %}"
                         alt="Supporting image for {{ maintenance_request.problem_title }}"
                         class="technician-details-image">
                 </a>
+
 
                 <p class="dashboard-description">
                     Click the image to open it in full size.
@@ -321,126 +329,119 @@
             {% endif %}
         </section>
 
-        <section class="technician-details-card">
-            <h2>Update Maintenance Progress</h2>
+       
+<section class="technician-details-card">
+    <h2>Update Maintenance Progress</h2>
 
-            {% if maintenance_request.status == 'assigned' %}
-                <p class="dashboard-description">
-                    Start working on this maintenance request when you are ready.
-                </p>
+    {% if maintenance_request.status == 'assigned' %}
+        <p class="dashboard-description">
+            Record your initial findings or start working on this request.
+        </p>
 
-                <form method="POST"
-                    action="{% url 'technician_update_request' maintenance_request.id %}">
-                    {% csrf_token %}
+        <form method="POST"
+              action="{% url 'technician_update_request' maintenance_request.id %}">
+            {% csrf_token %}
 
-                    <input type="hidden" name="status" value="in_progress">
+            <div style="margin-top: 20px;">
+                <label for="repair_notes"
+                       style="display: block; margin-bottom: 8px; font-weight: 600;">
+                    Repair Notes
+                </label>
 
-                    <div style="margin-top: 20px;">
-                        <label for="repair_notes"
-                            style="display: block; margin-bottom: 8px; font-weight: 600;">
-                            Repair Notes
-                        </label>
+                <textarea
+                    id="repair_notes"
+                    name="repair_notes"
+                    rows="5"
+                    placeholder="Describe your observations, work started, or initial findings..."
+                    style="width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #d6c5ba; border-radius: 8px; font: inherit;"
+                >{{ maintenance_request.repair_notes }}</textarea>
+            </div>
 
-                        <textarea
-                            id="repair_notes"
-                            name="repair_notes"
-                            rows="5"
-                            placeholder="Describe the work started, observations, or initial findings..."
-                            style="width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #d6c5ba; border-radius: 8px; font: inherit;"
-                        >{{ maintenance_request.repair_notes }}</textarea>
-                    </div>
+            <button type="submit"
+                    style="margin-top: 18px; padding: 12px 20px; background: #f7f3f0; color: #B7410E; border: 1px solid #B7410E; border-radius: 7px; cursor: pointer;">
+                Save Progress Note
+            </button>
 
-                    <button type="submit"
-                            style="margin-top: 18px; padding: 12px 20px; background: #B7410E; color: white; border: none; border-radius: 7px; cursor: pointer;">
-                        Start Maintenance
-                    </button>
-                </form>
+            <button type="submit"
+                    name="status"
+                    value="in_progress"
+                    style="margin-top: 18px; margin-left: 8px; padding: 12px 20px; background: #B7410E; color: white; border: none; border-radius: 7px; cursor: pointer;">
+                Start Maintenance
+            </button>
+        </form>
 
-            {% elif maintenance_request.status == 'in_progress' %}
-                <p class="dashboard-description">
-                    Update your repair notes and mark the request as completed
-                    when the maintenance work is finished.
-                </p>
+    {% elif maintenance_request.status == 'in_progress' %}
+        <p class="dashboard-description">
+            Save progress notes as you work. When the repair is finished,
+            enter your final notes and mark the request as completed.
+        </p>
 
-                <form method="POST"
-                    action="{% url 'technician_update_request' maintenance_request.id %}">
-                    {% csrf_token %}
+        <form method="POST"
+              action="{% url 'technician_update_request' maintenance_request.id %}">
+            {% csrf_token %}
 
-                    <div style="margin-top: 20px;">
-                        <label for="repair_notes"
-                            style="display: block; margin-bottom: 8px; font-weight: 600;">
-                            Repair Notes <span style="color: #B7410E;">*</span>
-                        </label>
+            <div style="margin-top: 20px;">
+                <label for="repair_notes"
+                       style="display: block; margin-bottom: 8px; font-weight: 600;">
+                    Repair Notes
+                </label>
 
-                        <textarea
-                            id="repair_notes"
-                            name="repair_notes"
-                            rows="6"
-                            required
-                            placeholder="Describe the repair work performed..."
-                            style="width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #d6c5ba; border-radius: 8px; font: inherit;"
-                        >{{ maintenance_request.repair_notes }}</textarea>
-                    </div>
+                <textarea
+                    id="repair_notes"
+                    name="repair_notes"
+                    rows="6"
+                    required
+                    placeholder="Describe the progress made or repair work performed..."
+                    style="width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #d6c5ba; border-radius: 8px; font: inherit;"
+                >{{ maintenance_request.repair_notes }}</textarea>
+            </div>
 
-                    <button type="submit"
-                            style="margin-top: 18px; padding: 12px 20px; background: #B7410E; color: white; border: none; border-radius: 7px; cursor: pointer;"
-                            name="status"
-                            value="completed">
-                        Mark as Completed
-                    </button>
-                </form>
+            <button type="submit"
+                    style="margin-top: 18px; padding: 12px 20px; background: #f7f3f0; color: #B7410E; border: 1px solid #B7410E; border-radius: 7px; cursor: pointer;">
+                Save Progress Note
+            </button>
 
-            {% elif maintenance_request.status == 'completed' %}
-                <p class="dashboard-description">
-                    This maintenance request has been completed.
-                </p>
+            <button type="submit"
+                    name="status"
+                    value="completed"
+                    style="margin-top: 18px; margin-left: 8px; padding: 12px 20px; background: #B7410E; color: white; border: none; border-radius: 7px; cursor: pointer;">
+                Mark as Completed
+            </button>
+        </form>
 
-                {% if maintenance_request.date_completed %}
-                    <p>
-                        <strong>Completed on:</strong>
-                        {{ maintenance_request.date_completed|date:"M d, Y - h:i A" }}
-                    </p>
-                {% endif %}
+    {% elif maintenance_request.status == 'completed' %}
+        <p class="dashboard-description">
+            This maintenance request has been completed.
+        </p>
 
-                {% if maintenance_request.repair_notes %}
-                    <p class="technician-details-description">{{ maintenance_request.repair_notes }}</p>
-                {% else %}
-                    <p>No repair notes were recorded.</p>
-                {% endif %}
+        {% if maintenance_request.date_completed %}
+            <p>
+                <strong>Completed on:</strong>
+                {{ maintenance_request.date_completed|date:"M d, Y - h:i A" }}
+            </p>
+        {% endif %}
 
-            {% else %}
-                <p class="dashboard-description">
-                    This request cannot currently be updated by the technician.
-                </p>
-            {% endif %}
+        {% if maintenance_request.repair_notes %}
+            <p class="technician-details-description">{{ maintenance_request.repair_notes }}</p>
+        {% else %}
+            <p>No repair notes were recorded.</p>
+        {% endif %}
 
-            <a href="{% url 'technician_requests' %}"
-            class="technician-details-back">
-                &larr; Back to Assigned Requests
-            </a>
-        </section>
+    {% else %}
+        <p class="dashboard-description">
+            This request cannot currently be updated by the technician.
+        </p>
+    {% endif %}
+
+    <a href="{% url 'technician_requests' %}"
+       class="technician-details-back">
+        &larr; Back to Assigned Requests
+    </a>
+    
+</section>
+
 
     </main>
 
-    <footer class="rust-footer">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <div class="footer-logo">RUST</div>
-                <p>Apartment Maintenance Portal</p>
-            </div>
-
-            <div class="footer-text">
-                <p>
-                    A centralized platform for managing apartment
-                    maintenance requests.
-                </p>
-
-                <p class="footer-copyright">
-                    &copy; 2026 Rust. All rights reserved.
-                </p>
-            </div>
-        </div>
-    </footer>
-
-</body>
-</html>
+   
+{% endblock %}

@@ -1,22 +1,42 @@
-# Virtual environment
-venv/
 
-# Python cache
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# Python cache and compiled files
 __pycache__/
 *.py[cod]
+*$py.class
 
-# Django local database
+# Local databases and database exports
 db.sqlite3
+*.sqlite3
+*.sql
+*.sql.gz
 
-# Uploaded media
+# Uploaded media and generated static files
 media/
+staticfiles/
 
 # Environment variables and secrets
 .env
+.env.*
+!.env.example
 
-# IDE files
+# Logs
+*.log
+logs/
+
+# IDE and editor files
 .vscode/
+.idea/
 
-# OS files
+# Operating system files
 .DS_Store
 Thumbs.db
+
+# Test and coverage output
+.coverage
+htmlcov/
+.pytest_cache/

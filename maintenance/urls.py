@@ -53,6 +53,11 @@ urlpatterns = [
     views.manager_reports,
     name='manager_reports'
     ),
+    path(
+    'manager/requests/<int:request_id>/cancel/',
+    views.cancel_maintenance_request,
+    name='cancel_maintenance_request',
+    ),
     # path('technician/dashboard/', 
     # views.technician_dashboard, 
     # name='technician_dashboard'),
@@ -75,6 +80,11 @@ urlpatterns = [
     'technician/progress/',
     views.technician_progress,
     name='technician_progress'
+    ),
+    path(
+    "request/<int:request_id>/image/",
+    views.maintenance_request_image,
+    name="maintenance_request_image",
     ),
     path(
     'profile/',

@@ -1,0 +1,64 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Rust - Apartment Maintenance{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap 5.3.8 -->
+    <link rel="stylesheet" href="{% static 'maintenance/vendor/bootstrap/css/bootstrap.min.css' %}">
+
+    <!-- Rust custom styles: load after Bootstrap -->
+    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    {% block navigation %}{% endblock %}
+
+    {% if messages %}
+        <div class="messages-container" aria-live="polite">
+            {% for message in messages %}
+                <div class="message message-{{ message.tags|default:'info' }}" role="status">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    {% block footer %}
+    <footer class="rust-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">RUST</div>
+                <p>Apartment Maintenance Portal</p>
+            </div>
+
+            <div class="footer-text">
+                <p>A centralized platform for managing apartment maintenance requests.</p>
+                <p class="footer-copyright">&copy; 2026 Rust. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <!-- Bootstrap JavaScript bundle -->
+    <script src="{% static 'maintenance/vendor/bootstrap/js/bootstrap.bundle.min.js' %}" defer></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

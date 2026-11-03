@@ -1,27 +1,12 @@
-{% load static %}
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{% extends "maintenance/base_auth.html" %}
 
-    <title>Rust - Tenant Registration</title>
+{% block title %}Rust - Tenant Registration{% endblock %}
 
-    <!-- Rust fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+{% block body_class %}register-page{% endblock %}
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Roboto+Slab:wght@600;700&display=swap"
-      rel="stylesheet"
-    />
+{% block content %}
 
-    <!-- Rust stylesheet -->
-    <link rel="stylesheet" href="{% static 'maintenance/style.css' %}" />
-  </head>
-
-  <body class="register-page">
     <main class="register-container">
       <section class="register-card">
         <!-- Header -->
@@ -161,5 +146,5 @@
         </div>
       </div>
     </footer>
-  </body>
-</html>
+ 
+{% endblock %}
