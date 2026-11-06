@@ -65,7 +65,11 @@ ALLOWED_HOSTS = [
     for host in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
     if host.strip()
 ]
-
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 if not DEBUG and not ALLOWED_HOSTS:
     raise ValueError(
         "DJANGO_ALLOWED_HOSTS must contain at least one hostname "
