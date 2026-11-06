@@ -65,7 +65,11 @@ ALLOWED_HOSTS = [
     for host in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
     if host.strip()
 ]
-
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 if not DEBUG and not ALLOWED_HOSTS:
     raise ValueError(
         "DJANGO_ALLOWED_HOSTS must contain at least one hostname "
@@ -134,6 +138,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -161,32 +166,45 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # -------------------------------------------------------------------
-# Database: MySQL
+# Database configuration
 # -------------------------------------------------------------------
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": env_required("DB_NAME"),
-        "USER": env_required("DB_USER"),
-        "PASSWORD": env_required("DB_PASSWORD"),
-        "HOST": env_required("DB_HOST"),
-        "PORT": env_required("DB_PORT"),
-        "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "60")),
-        "CONN_HEALTH_CHECKS": True,
-        "OPTIONS": {
-            "charset": "utf8mb4",
-            "init_command": (
-                "SET sql_mode = "
-                "'STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,"
-                "NO_ENGINE_SUBSTITUTION'"
-            ),
-        },
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    import dj_database_url
+
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
     }
-}
 
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": env_required("DB_NAME"),
+            "USER": env_required("DB_USER"),
+            "PASSWORD": env_required("DB_PASSWORD"),
+            "HOST": env_required("DB_HOST"),
+            "PORT": env_required("DB_PORT"),
+            "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "60")),
+            "CONN_HEALTH_CHECKS": True,
+            "OPTIONS": {
+                "charset": "utf8mb4",
+                "init_command": (
+                    "SET sql_mode = "
+                    "'STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,"
+                    "NO_ENGINE_SUBSTITUTION'"
+                ),
+            },
+        }
+    }
 
 # -------------------------------------------------------------------
 # Authentication and password validation
@@ -237,6 +255,15 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 STATICFILES_DIRS = (
     [BASE_DIR / "static"]
